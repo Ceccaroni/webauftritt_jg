@@ -97,7 +97,7 @@
       padding: .9rem;
     }
 
-    /* Mini-Agenda im Hero (rechts, unter dem Porträt) */
+    /* Mini-Agenda (links unter dem Slogan) */
     .mini-agenda{ margin-top:.75rem; }
     .mini-agenda h3{ font-size:1.0rem; margin:.1rem 0 .4rem 0; }
     .agenda-list{ display:grid; gap:.4rem; }
@@ -110,13 +110,6 @@
     .agenda-meta .where{ color: #2b2b2b; }
     .agenda-cta{ margin-top:.35rem; }
     .agenda-cta a{ font-weight:650; }
-
-    /* Engage-Bar unter dem Hero */
-    .engage{ background:#fff; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin: .9rem 0 0 0; }
-    .engage .inner{ display:flex; gap:.75rem; align-items:center; padding:.7rem .9rem; }
-    .engage strong{ margin-right:.25rem; }
-    .engage .spacer{ flex:1; }
-    .engage .btn{ box-shadow:none; }
 
     /* Filter */
     .filters{ display:grid; grid-template-columns: 1fr auto auto; gap: .75rem; align-items: end; margin-top: .75rem; }
@@ -158,7 +151,7 @@
     .actions{ display:flex; gap:.5rem; padding:.75rem .95rem; border-top:1px solid var(--border); background:#fafbfc; }
     .actions .ghost{ appearance:none; background:#fff; border:1px solid var(--border); border-radius:8px; padding:.48rem .7rem; font-size:.95rem; cursor:pointer; }
 
-    /* Zeitspur komprimiert */
+    /* Zeitspur komprimiert (derzeit nicht im DOM; Guard im JS) */
     .zeitspur{ display:flex; gap:.6rem; overflow:auto; padding:.6rem .25rem 0 .25rem; scroll-snap-type:x mandatory; }
     .zeitspur .pill{
       flex:0 0 auto; min-width: 220px; scroll-snap-align:start;
@@ -213,7 +206,6 @@
       .cta .btn{ padding:.5rem .8rem; font-weight:600; }
       .brandbar{ align-items:start; }
 
-      .engage .inner{ flex-direction: column; align-items: stretch; gap:.5rem; }
       .filters{ grid-template-columns: 1fr; gap:.6rem; align-items:stretch; }
       .search input{ padding:.6rem .8rem; }
 
@@ -261,25 +253,15 @@
         <div>
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
-        </div>
-        <div class="tile hero-portrait" aria-label="Porträt">
-          <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
-          <!-- Mini-Agenda -->
+          <!-- Mini-Agenda (hier links unter dem Slogan) -->
           <div class="mini-agenda" aria-label="Nächste Termine in Brugg">
             <h3>Nächste Termine in Brugg</h3>
             <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <!-- Engage-Bar (heute mitmachen) -->
-    <section class="engage" aria-label="Heute mitmachen">
-      <div class="inner wrap">
-        <strong>Heute mitmachen:</strong>
-        <span id="engageText" class="small">Wähle den schnellen Weg – direkt Kontakt aufnehmen oder zum nächsten Termin kommen.</span>
-        <div class="spacer"></div>
-        <button class="btn primary" id="mitmachenPrimary" aria-label="Jetzt mitmachen">Jetzt mitmachen</button>
+        <div class="tile hero-portrait" aria-label="Porträt">
+          <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
+        </div>
       </div>
     </section>
 
@@ -322,13 +304,10 @@
         { date:"2025-09-17", text:"Bildung: Gespräch Schulleitungen – Entlastungspaket" },
         { date:"2025-09-16", text:"Mobilität: Veloroute Schule–Bahnhof – Prioritäten gesetzt" }
       ],
-      // Neu: Mini-Agenda (leer möglich; Fallback-Text wird dann angezeigt)
+      // Mini-Agenda – leer erlaubt
       agenda: [
-        // Beispiel für spätere Befüllung:
         // { date:"2025-09-24", time:"18:30", title:"Veloroute-Begehung", place:"Bahnhof Brugg", purpose:"Lückenanalyse", ctaLabel:"Ich komme", ctaHref:"#"},
-        // { date:"2025-10-02", time:"19:00", title:"Sprechstunde", place:"Café XYZ", purpose:"Offene Fragen", ctaLabel:"Slot sichern", ctaHref:"mailto:..."}
       ],
-      // Neu: Transparenz-Links (leer möglich)
       transparency: [
         // { title:"Fernwärme: Protokoll Werkleitung", source:"Gemeinde Brugg", date:"2025-09-12", href:"https://…"},
       ],
@@ -443,7 +422,9 @@
     }
 
     function buildTimeline(){
-      const z = $("#zeitspur"); z.innerHTML = "";
+      const z = $("#zeitspur");
+      if(!z) return; // Guard: Element existiert hier nicht
+      z.innerHTML = "";
       DATA.timeline.forEach(item => z.appendChild(el("div", { class:"pill" }, `${item.date} – ${item.text}`)));
     }
 
@@ -462,7 +443,6 @@
       }
       items.forEach(it => {
         const dateLabel = [it.date || "", it.time || ""].filter(Boolean).join(" ");
-        const metaTop = it.title ? it.title : "";
         const where = it.place ? el("div", { class:"where" }, it.place) : null;
         const purpose = it.purpose ? el("div", {}, it.purpose) : null;
         const cta = (it.ctaHref && it.ctaLabel)
@@ -473,7 +453,7 @@
           el("div", { class:"agenda-item" }, [
             el("div", { class:"agenda-date" }, dateLabel || ""),
             el("div", { class:"agenda-meta" }, [
-              el("div", {}, metaTop),
+              el("div", {}, it.title || ""),
               where, purpose, cta
             ].filter(Boolean))
           ])
@@ -487,14 +467,15 @@
       if(!ul) return;
       ul.innerHTML = "";
       const links = DATA.transparency || [];
-      if(links.length === 0){
-        // Kein Eintrag – nichts anzeigen (lässt Überschrift + Einleitung stehen)
-        return;
-      }
+      if(links.length === 0){ return; }
       links.forEach(d => {
-        const line = [d.title, d.source ? `(${d.source}` : null, d.date ? `· ${d.date})` : (d.source ? ")" : null)]
-                      .filter(Boolean).join(" ");
-        const a = el("a", { href: d.href || "#" }, line || d.title || "Beleg");
+        const parts = [];
+        if(d.title) parts.push(d.title);
+        const meta = [];
+        if(d.source) meta.push(d.source);
+        if(d.date) meta.push(d.date);
+        if(meta.length) parts.push(`(${meta.join(" · ")})`);
+        const a = el("a", { href: d.href || "#" }, parts.join(" "));
         ul.appendChild(el("li", {}, a));
       });
     }
@@ -542,10 +523,6 @@
     $("#search").addEventListener("input", e => { state.q = e.target.value || ""; render(); });
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
-    $("#mitmachenPrimary").addEventListener("click", () => {
-      // Default: leite auf denselben Flow wie Header-Button
-      document.getElementById("mitmachenBtn").click();
-    });
 
     // Initialisieren
     buildFilters(); buildTimeline();
