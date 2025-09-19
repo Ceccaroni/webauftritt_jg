@@ -97,6 +97,27 @@
       padding: .9rem;
     }
 
+    /* Mini-Agenda im Hero (rechts, unter dem Porträt) */
+    .mini-agenda{ margin-top:.75rem; }
+    .mini-agenda h3{ font-size:1.0rem; margin:.1rem 0 .4rem 0; }
+    .agenda-list{ display:grid; gap:.4rem; }
+    .agenda-item{
+      display:grid; grid-template-columns:auto 1fr; gap:.6rem;
+      background:#fff; border:1px solid var(--border); border-radius:10px; padding:.55rem .65rem;
+    }
+    .agenda-date{ font-weight:700; white-space:nowrap; }
+    .agenda-meta{ font-size:.95rem; line-height:1.25; }
+    .agenda-meta .where{ color: #2b2b2b; }
+    .agenda-cta{ margin-top:.35rem; }
+    .agenda-cta a{ font-weight:650; }
+
+    /* Engage-Bar unter dem Hero */
+    .engage{ background:#fff; border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); margin: .9rem 0 0 0; }
+    .engage .inner{ display:flex; gap:.75rem; align-items:center; padding:.7rem .9rem; }
+    .engage strong{ margin-right:.25rem; }
+    .engage .spacer{ flex:1; }
+    .engage .btn{ box-shadow:none; }
+
     /* Filter */
     .filters{ display:grid; grid-template-columns: 1fr auto auto; gap: .75rem; align-items: end; margin-top: .75rem; }
     .search{ display:flex; gap:.5rem; align-items:center; }
@@ -149,7 +170,8 @@
     .transparenz{ display:grid; gap:1rem; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); padding: 1rem 0; }
     .tcard{ background:#fff; border:1px solid var(--border); border-radius: var(--radius); padding:.8rem; box-shadow: var(--shadow); }
     .small{ color: var(--muted); font-size:.9rem; }
-
+    .tlist{ margin:.5rem 0 0 0; padding-left:1.1rem; }
+    .tlist li{ margin:.25rem 0; }
 
     .hero-portrait img{
       width:100%; height:auto; display:block;
@@ -191,6 +213,7 @@
       .cta .btn{ padding:.5rem .8rem; font-weight:600; }
       .brandbar{ align-items:start; }
 
+      .engage .inner{ flex-direction: column; align-items: stretch; gap:.5rem; }
       .filters{ grid-template-columns: 1fr; gap:.6rem; align-items:stretch; }
       .search input{ padding:.6rem .8rem; }
 
@@ -241,7 +264,22 @@
         </div>
         <div class="tile hero-portrait" aria-label="Porträt">
           <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
+          <!-- Mini-Agenda -->
+          <div class="mini-agenda" aria-label="Nächste Termine in Brugg">
+            <h3>Nächste Termine in Brugg</h3>
+            <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
+          </div>
         </div>
+      </div>
+    </section>
+
+    <!-- Engage-Bar (heute mitmachen) -->
+    <section class="engage" aria-label="Heute mitmachen">
+      <div class="inner wrap">
+        <strong>Heute mitmachen:</strong>
+        <span id="engageText" class="small">Wähle den schnellen Weg – direkt Kontakt aufnehmen oder zum nächsten Termin kommen.</span>
+        <div class="spacer"></div>
+        <button class="btn primary" id="mitmachenPrimary" aria-label="Jetzt mitmachen">Jetzt mitmachen</button>
       </div>
     </section>
 
@@ -261,6 +299,7 @@
       <div class="tcard">
         <h3>Transparenz</h3>
         <p class="small">Quellen, Abstimmungsverhalten, Sitzungstermine. Veröffentlichung quartalsweise.</p>
+        <ul id="transparencyList" class="tlist" aria-label="Belege und Quellen"></ul>
       </div>
       <div class="tcard">
         <h3>Was als Nächstes kommt</h3>
@@ -283,6 +322,17 @@
         { date:"2025-09-17", text:"Bildung: Gespräch Schulleitungen – Entlastungspaket" },
         { date:"2025-09-16", text:"Mobilität: Veloroute Schule–Bahnhof – Prioritäten gesetzt" }
       ],
+      // Neu: Mini-Agenda (leer möglich; Fallback-Text wird dann angezeigt)
+      agenda: [
+        // Beispiel für spätere Befüllung:
+        // { date:"2025-09-24", time:"18:30", title:"Veloroute-Begehung", place:"Bahnhof Brugg", purpose:"Lückenanalyse", ctaLabel:"Ich komme", ctaHref:"#"},
+        // { date:"2025-10-02", time:"19:00", title:"Sprechstunde", place:"Café XYZ", purpose:"Offene Fragen", ctaLabel:"Slot sichern", ctaHref:"mailto:..."}
+      ],
+      // Neu: Transparenz-Links (leer möglich)
+      transparency: [
+        // { title:"Fernwärme: Protokoll Werkleitung", source:"Gemeinde Brugg", date:"2025-09-12", href:"https://…"},
+      ],
+
       cards: [
 
         {
@@ -397,6 +447,58 @@
       DATA.timeline.forEach(item => z.appendChild(el("div", { class:"pill" }, `${item.date} – ${item.text}`)));
     }
 
+    // ---- Mini-Agenda Rendering ----
+    function renderAgenda(){
+      const host = $("#miniAgenda");
+      if(!host) return;
+      host.innerHTML = "";
+      const items = (DATA.agenda || []).slice(0,3);
+      if(items.length === 0){
+        host.appendChild(el("div", { class:"agenda-item" }, [
+          el("div", { class:"agenda-date" }, "—"),
+          el("div", { class:"agenda-meta" }, "Noch keine Termine publiziert.")
+        ]));
+        return;
+      }
+      items.forEach(it => {
+        const dateLabel = [it.date || "", it.time || ""].filter(Boolean).join(" ");
+        const metaTop = it.title ? it.title : "";
+        const where = it.place ? el("div", { class:"where" }, it.place) : null;
+        const purpose = it.purpose ? el("div", {}, it.purpose) : null;
+        const cta = (it.ctaHref && it.ctaLabel)
+          ? el("div", { class:"agenda-cta" }, el("a", { href: it.ctaHref }, it.ctaLabel))
+          : null;
+
+        host.appendChild(
+          el("div", { class:"agenda-item" }, [
+            el("div", { class:"agenda-date" }, dateLabel || ""),
+            el("div", { class:"agenda-meta" }, [
+              el("div", {}, metaTop),
+              where, purpose, cta
+            ].filter(Boolean))
+          ])
+        );
+      });
+    }
+
+    // ---- Transparenzliste Rendering ----
+    function renderTransparency(){
+      const ul = $("#transparencyList");
+      if(!ul) return;
+      ul.innerHTML = "";
+      const links = DATA.transparency || [];
+      if(links.length === 0){
+        // Kein Eintrag – nichts anzeigen (lässt Überschrift + Einleitung stehen)
+        return;
+      }
+      links.forEach(d => {
+        const line = [d.title, d.source ? `(${d.source}` : null, d.date ? `· ${d.date})` : (d.source ? ")" : null)]
+                      .filter(Boolean).join(" ");
+        const a = el("a", { href: d.href || "#" }, line || d.title || "Beleg");
+        ul.appendChild(el("li", {}, a));
+      });
+    }
+
     function statusClass(s){
       return s==="Entwurf" ? "status-entwurf" : s==="In Arbeit" ? "status-inarbeit" : s==="beschlossen" ? "status-beschlossen" : "";
     }
@@ -436,11 +538,19 @@
       host.setAttribute("aria-busy","false");
     }
 
+    // Suche / CTAs
     $("#search").addEventListener("input", e => { state.q = e.target.value || ""; render(); });
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
+    $("#mitmachenPrimary").addEventListener("click", () => {
+      // Default: leite auf denselben Flow wie Header-Button
+      document.getElementById("mitmachenBtn").click();
+    });
 
-    buildFilters(); buildTimeline(); render();
+    // Initialisieren
+    buildFilters(); buildTimeline();
+    renderAgenda(); renderTransparency();
+    render();
   </script>
 </body>
 </html>
