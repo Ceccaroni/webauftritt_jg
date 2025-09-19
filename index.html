@@ -221,6 +221,14 @@
       body{ padding-bottom: max(env(safe-area-inset-bottom), 0px); }
     }
 
+    /* --- Agenda-Linkfarbe (Brandgrün) + Hover/Fokus --- */
+    .agenda-cta a{
+      color:#3f6b00;
+      text-decoration: underline;
+      line-height: 2.2; /* Klickfläche ~44px */
+    }
+    .agenda-cta a:hover{ color:#2f5200; }
+    .agenda-cta a:focus-visible{ outline:3px solid var(--focus); outline-offset:2px; }
   </style>
 </head>
 <body>
@@ -551,6 +559,16 @@
       return new Blob([ics], { type: "text/calendar;charset=utf-8" });
     }
 
+    // ---- CH-Datumsformat ----
+    function formatCHDate(dateStr, timeStr){
+      const d = parseLocalDateTime(dateStr, timeStr);
+      const fmt = new Intl.DateTimeFormat('de-CH', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+      const datePart = fmt.format(d); // z. B. "Freitag, 26. September 2025"
+      const [hh, mm] = (timeStr||'09:00').split(':');
+      const timePart = `${hh}.${mm} Uhr`;
+      return `${datePart}, ${timePart}`;
+    }
+
     // ---- Mini-Agenda Rendering ----
     function renderAgenda(){
       const host = $("#miniAgenda");
@@ -565,24 +583,33 @@
         return;
       }
       items.forEach(it => {
-        const dateLabel = [it.date || "", it.time || ""].filter(Boolean).join(" ");
+        const human = formatCHDate(it.date, it.time);
+        const dtAttr = `${it.date}T${(it.time||'09:00')}:00`;
         const where = it.place ? el("div", { class:"where" }, it.place) : null;
         const purpose = it.purpose ? el("div", {}, it.purpose) : null;
 
         // CTA-Link (falls vorhanden)
-        const ctaLink = (it.ctaHref && it.ctaLabel) ? el("a", { href: it.ctaHref }, it.ctaLabel) : null;
+        const ctaLink = (it.ctaHref && it.ctaLabel)
+          ? el("a", { href: it.ctaHref }, it.ctaLabel)
+          : null;
 
         // ICS-Link
         const icsBlob = makeICSBlob(it);
         const icsUrl = URL.createObjectURL(icsBlob);
         const icsName = `JG_${(it.title||"Termin").replace(/\s+/g,'_')}_${it.date||"datum"}.ics`;
-        const icsLink = el("a", { href: icsUrl, download: icsName }, "Kalendereintrag (.ics)");
+        const icsLink = el("a", {
+          href: icsUrl,
+          download: icsName,
+          "aria-label": `Kalendereintrag herunterladen: ${it.title||'Termin'} – ${human}`
+        }, "Kalendereintrag (.ics)");
 
         const ctaWrap = el("div", { class:"agenda-cta" }, [ctaLink, icsLink].filter(Boolean));
 
         host.appendChild(
           el("div", { class:"agenda-item" }, [
-            el("div", { class:"agenda-date" }, dateLabel || ""),
+            el("div", { class:"agenda-date" },
+              el("time", { datetime: dtAttr }, human)
+            ),
             el("div", { class:"agenda-meta" }, [
               el("div", {}, it.title || ""),
               where, purpose, ctaWrap
