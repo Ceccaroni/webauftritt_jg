@@ -87,8 +87,8 @@
 
     /* Hero nüchtern */
     .hero{
-      background: linear-gradient(0deg, #eef3e8 0%, #ffffff 60%);
-      border-bottom: 1px solid var(--border);
+      background: transparent;          /* ← Kasten entfernt */
+      border-bottom: none;              /* ← Linie entfernt */
     }
     .hero-grid{
       display:grid; grid-template-columns: 1.2fr .8fr; gap: 1rem; align-items: center; padding: 1.25rem 0;
@@ -343,7 +343,7 @@
           "address": {
             "@type": "PostalAddress",
             "addressLocality": "Brugg",
-            "addressCountry": "CH"
+          "addressCountry": "CH"
           }
         },
         "description": "Fernwärme und Sozialtarif verständlich erklärt.",
