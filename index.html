@@ -294,6 +294,72 @@
     </div>
   </footer>
 
+  <!-- JSON-LD für die nächsten Events -->
+  <script type="application/ld+json" id="events-jsonld">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Event",
+        "name": "Veloroute-Spotcheck Ost",
+        "startDate": "2025-09-26T18:30:00+02:00",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "location": {
+          "@type": "Place",
+          "name": "Bahnhof Brugg",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Brugg",
+            "addressCountry": "CH"
+          }
+        },
+        "description": "Lückenanalyse und Quick Wins priorisieren.",
+        "organizer": { "@type": "Person", "name": "Julia Grieder" },
+        "url": "https://example.ch/termine/veloroute-spotcheck-ost"
+      },
+      {
+        "@type": "Event",
+        "name": "Energieforum Quartier Au",
+        "startDate": "2025-10-03T19:00:00+02:00",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "location": {
+          "@type": "Place",
+          "name": "Schulhaus Au",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Brugg",
+            "addressCountry": "CH"
+          }
+        },
+        "description": "Fernwärme und Sozialtarif verständlich erklärt.",
+        "organizer": { "@type": "Person", "name": "Julia Grieder" },
+        "url": "https://example.ch/termine/energieforum-au"
+      },
+      {
+        "@type": "Event",
+        "name": "Sprechstunde auf dem Neumarktplatz",
+        "startDate": "2025-10-10T12:15:00+02:00",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "location": {
+          "@type": "Place",
+          "name": "Neumarktplatz Brugg",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Brugg",
+            "addressCountry": "CH"
+          }
+        },
+        "description": "Kurze Gespräche zu Bildung, Verkehr, Energie.",
+        "organizer": { "@type": "Person", "name": "Julia Grieder" },
+        "url": "https://example.ch/termine/sprechstunde-neumarkt"
+      }
+    ]
+  }
+  </script>
+
   <script>
     // Daten – priorisierte Themen Bildung, Verkehr, Energie
     const DATA = {
@@ -304,10 +370,11 @@
         { date:"2025-09-17", text:"Bildung: Gespräch Schulleitungen – Entlastungspaket" },
         { date:"2025-09-16", text:"Mobilität: Veloroute Schule–Bahnhof – Prioritäten gesetzt" }
       ],
-      // Mini-Agenda – leer erlaubt
+      // Mini-Agenda – Dummy-Termine
       agenda: [
-        // Beispiel:
-        // { date:"2025-09-24", time:"18:30", title:"Veloroute-Begehung", place:"Bahnhof Brugg", purpose:"Lückenanalyse", ctaLabel:"Ich komme", ctaHref:"#"},
+        { date:"2025-09-26", time:"18:30", title:"Veloroute-Spotcheck Ost", place:"Bahnhof Brugg", purpose:"Lückenanalyse / Quick Wins", ctaLabel:"Details", ctaHref:"https://example.ch/termine/veloroute-spotcheck-ost" },
+        { date:"2025-10-03", time:"19:00", title:"Energieforum Quartier Au", place:"Schulhaus Au, Brugg", purpose:"Fernwärme & Sozialtarif erklären", ctaLabel:"Details", ctaHref:"https://example.ch/termine/energieforum-au" },
+        { date:"2025-10-10", time:"12:15", title:"Sprechstunde Neumarktplatz", place:"Neumarktplatz, Brugg", purpose:"Kurzgespräche zu Bildung/Verkehr/Energie", ctaLabel:"Details", ctaHref:"https://example.ch/termine/sprechstunde-neumarkt" }
       ],
       transparency: [
         // { title:"Fernwärme: Protokoll Werkleitung", source:"Gemeinde Brugg", date:"2025-09-12", href:"https://…"},
