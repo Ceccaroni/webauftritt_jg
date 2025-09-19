@@ -10,7 +10,7 @@
       /* Farben gemäss ernsthafter, sachlicher Umsetzung – Brandgrün nach verbreiteter Webverwendung #84B414 (vgl. Les VERT-E-S) */
       --brand: #84B414;
       --brand-ink: #ffffff;
-      --brand-dark: #5f8a0f;
+      --brand-dark: #5a8f00; /* dunkler für AA-Kontrast */
       --bg: #f6f8f5;
       --paper: #ffffff;
       --ink: #1a1a1a;
@@ -45,6 +45,18 @@
     .skip-link{ position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
     .skip-link:focus{ left: 1rem; top: 1rem; padding:.5rem .75rem; background:#fff; border:2px solid var(--focus); border-radius:6px; z-index: 1000; }
 
+    /* Tastaturfokus gut sichtbar (WCAG 2.2 AA) */
+    :focus{ outline: none; }
+    :focus-visible{
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .btn:focus-visible,
+    .chip:focus-visible,
+    .search input:focus-visible{
+      box-shadow: 0 0 0 3px rgba(11,95,255,.25);
+    }
+
     header{
       position: sticky; top:0; z-index: 50;
       background:#fff; border-bottom:1px solid var(--border);
@@ -66,7 +78,7 @@
       appearance:none; border:1px solid transparent; border-radius: 999px;
       padding:.6rem .95rem; font-weight: 650; cursor:pointer; box-shadow: var(--shadow);
     }
-    .btn.primary{ background: var(--brand); color: var(--brand-ink); }
+    .btn.primary{ background: var(--brand-dark); color: var(--brand-ink); } /* AA-kontrast */
     .btn.primary:hover{ filter: brightness(.98); }
     .btn.secondary{ background:#fff; color: var(--ink); border:1px solid var(--border); }
 
@@ -96,7 +108,7 @@
     .chip{
       padding:.45rem .75rem; border:1px solid var(--border); border-radius: 999px; background:#fff; color:#222; cursor:pointer; font-size:.95rem;
     }
-    .chip[aria-pressed="true"]{ background: var(--brand); color: var(--brand-ink); border-color: transparent; }
+    .chip[aria-pressed="true"]{ background: var(--brand-dark); color: var(--brand-ink); border-color: transparent; } /* AA-kontrast */
 
     /* Mosaik */
     .masonry{ column-gap: var(--col-gap); margin: 1rem auto 2rem auto; }
@@ -211,8 +223,9 @@
       </nav>
     </div>
   
-    <div class="party-badge" aria-label="Partei-Logo">
-      <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="Logo GRÜNE Schweiz" loading="lazy"
+    <!-- Logo dekorativ: aus dem Tab-Fluss, Alt leer -->
+    <div class="party-badge" aria-hidden="true">
+      <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" role="presentation" loading="lazy"
            onerror="this.onerror=null;this.src='assets/logo-gruene-placeholder.svg';">
     </div>
 
