@@ -21,13 +21,17 @@
 header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);backdrop-filter:saturate(1.1) blur(6px)}
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 1rem}
 .brandbar{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;gap:1rem;min-height:var(--header-h)}
-.brand{display:flex;align-items:center;gap:.75rem}
+.brand{display:flex;align-items:center;gap:.75rem;min-width:0}
 .brand .mark{width:40px;height:40px;border-radius:10px;background:var(--brand);box-shadow:inset 0 0 0 2px #fff,0 1px 2px rgba(0,0,0,.08)}
-.brand h1{margin:0;font-size:1.1rem;font-weight:700;letter-spacing:.2px}
-.cta{display:flex;gap:.5rem}
+.brand h1{margin:0;font-size:1.1rem;font-weight:700;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.party-mini{height:22px;margin-left:.5rem;opacity:.9;flex:0 0 auto}
+@media (max-width:720px){.party-mini{height:18px}}
+
+.cta{display:flex;gap:.5rem;flex-wrap:wrap;min-width:0;justify-content:flex-end}
 .btn{appearance:none;border:1px solid transparent;border-radius:999px;padding:.6rem .95rem;font-weight:650;cursor:pointer;box-shadow:var(--shadow)}
 .btn.primary{background:var(--brand-dark);color:var(--brand-ink)} .btn.primary:hover{filter:brightness(.98)}
 .btn.secondary{background:#fff;color:var(--ink);border:1px solid var(--border)}
+@media (max-width:720px){.cta .btn{flex:1 1 100%}}
 
 /* Hero */
 .hero{background:transparent;border-bottom:none}
@@ -116,22 +120,14 @@ footer{border-top:1px solid var(--border);background:#fff}
   a{color:#000;text-decoration:underline}
 }
 
-.party-badge{position:absolute;right:0;top:12px;z-index:60;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:.35rem;display:flex;align-items:center}
-.party-badge img{height:28px;width:auto;display:block;image-rendering:auto}
-@media(max-width:720px){.party-badge{position:static;margin:.5rem 0 0 0} header .brandbar{grid-template-columns:auto auto}}
-.brandbar.badge-collide{padding-right:112px}
-@media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
-.filters{display:grid;grid-template-columns:auto auto 1fr;gap:.75rem;align-items:end;margin-top:.75rem}
-
 /* Phone */
 @media(max-width:720px){
   .hero-grid{grid-template-columns:1fr;gap:.75rem;padding:.8rem 0}
   .hero .tile{padding:.75rem}
   .hero h2{font-size:1.25rem;line-height:1.25}
   .hero p{font-size:1rem}
-  .hero-portrait{order:2}
+  .hero-portrait{order:-1} /* Foto zuerst auf Mobile */
   .live-box{order:1}
-  .cta .btn{padding:.5rem .8rem;font-weight:600}
   .brandbar{align-items:start}
   .filters{grid-template-columns:1fr;gap:.6rem;align-items:stretch}
   .search input{padding:.6rem .8rem}
@@ -155,25 +151,20 @@ footer{border-top:1px solid var(--border);background:#fff}
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
 
   <header role="banner">
-    <div class="wrap brandbar badge-collide">
+    <div class="wrap brandbar">
       <div class="brand">
         <div class="mark" aria-hidden="true"></div>
         <h1>Unordentlich effektiv.</h1>
+        <!-- Parteilogo dezent inline statt als Badge-Balken -->
+        <img class="party-mini" src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="Grüne Aargau" loading="lazy"
+             onerror="this.onerror=null;this.src='assets/logo-gruene-placeholder.svg';">
       </div>
       <nav class="cta" aria-label="Hauptaktionen">
         <button class="btn secondary" id="aboutBtn" aria-controls="ueber-mich" aria-expanded="false">Über mich</button>
         <button class="btn primary" id="mitmachenBtn" aria-label="Mitmachen">Mitmachen</button>
         <button class="btn secondary" id="newsletterBtn" aria-label="Newsletter">Newsletter</button>
       </nav>
-
-```
-  <div class="party-badge" aria-hidden="true">
-    <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" role="presentation" loading="lazy"
-         onerror="this.onerror=null;this.src='assets/logo-gruene-placeholder.svg';">
-  </div>
-</div>
-```
-
+    </div>
   </header>
 
   <main id="main" class="wrap" role="main">
@@ -185,7 +176,7 @@ footer{border-top:1px solid var(--border);background:#fff}
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Alles datiert, nachvollziehbar, überprüfbar.</p>
 
 ```
-      <div class="live-box tile" aria-label="Diese Woche erledigt">
+      <div class="live-box tile" aria-label="Aktuelles Update">
         <h3>Diese Woche erledigt</h3>
         <div id="liveList" class="live-list" aria-live="polite"></div>
         <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
@@ -200,7 +191,7 @@ footer{border-top:1px solid var(--border);background:#fff}
       </div>
     </div>
 
-    <!-- Optionales Porträt; bleibt authentisch, kein Polit-Lächeln -->
+    <!-- Porträt zuerst auf Mobile; authentisch, kein Polit-Lächeln -->
     <div class="tile hero-portrait" aria-label="Porträt">
       <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder am Aareufer in Brugg, unterwegs im Regen – nahbar, im Gespräch." loading="eager">
     </div>
@@ -261,7 +252,7 @@ footer{border-top:1px solid var(--border);background:#fff}
       {"@type":"Event","name":"Sprechstunde auf dem Neumarktplatz","startDate":"2025-10-10T12:15:00+02:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"Neumarktplatz Brugg","address":{"@type":"PostalAddress","addressLocality":"Brugg","addressCountry":"CH"}},"description":"Kurze Gespräche zu Bildung, Verkehr, Energie.","organizer":{"@type":"Person","name":"Julia Grieder"},"url":"https://example.ch/termine/sprechstunde-neumarkt"}]}</script>
 
   <script>
-    /* Entferne versehentlich eingefügte Markdown-Backticks ``` aus dem DOM */
+    /* Sicherheitsnetz: Entferne versehentlich eingefügte Markdown-Backticks ``` aus dem DOM */
     document.addEventListener('DOMContentLoaded', () => {
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       const kill=[]; while(w.nextNode()){ const n=w.currentNode; if(n.nodeValue && n.nodeValue.trim()==='```') kill.push(n); }
@@ -287,7 +278,7 @@ footer{border-top:1px solid var(--border);background:#fff}
           text:"Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
           next:"Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln." },
         { id:"c3", title:"Sichere, durchgängige Velorouten", status:"In Arbeit", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
-          text:"Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten &lt; 150’000 CHF.",
+          text:"Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
           next:"Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten." },
         { id:"c4", title:"Energie fair: Fernwärme mit Sozialtarif", status:"In Arbeit", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
           text:"Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
@@ -383,8 +374,8 @@ footer{border-top:1px solid var(--border);background:#fff}
       });
     }
 
-    // Live-Box: letzte 7 Tage
-    function withinLastDays(iso, days=7){
+    // Live-Box: schlank (letzte 30 Tage, max. 1 Eintrag)
+    function withinLastDays(iso, days=30){
       if(!iso) return false;
       const d=new Date(iso+"T00:00:00");
       const now=new Date();
@@ -393,22 +384,21 @@ footer{border-top:1px solid var(--border);background:#fff}
     }
     function renderLive(){
       const host=$("#liveList"); if(!host) return; host.innerHTML="";
-      const recent=(DATA.cards||[]).filter(c=>withinLastDays(c.date,7)).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,2);
+      const recent=(DATA.cards||[]).filter(c=>withinLastDays(c.date,30)).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,1);
       if(recent.length===0){
         host.appendChild(el("div",{class:"live-item"},[
-          el("div",{}, "Diese Woche noch keine Einträge veröffentlicht."),
-          el("div",{class:"stamp"}, "Stand: " + new Intl.DateTimeFormat('de-CH',{dateStyle:'medium', timeStyle:'short'}).format(new Date()))
+          el("div",{}, "Kein Update in diesem Monat."),
+          el("div",{class:"stamp"}, "Stand: " + new Intl.DateTimeFormat('de-CH',{dateStyle:'medium'}).format(new Date()))
         ]));
         return;
       }
-      recent.forEach(c=>{
-        host.appendChild(el("div",{class:"live-item"},[
-          el("strong",{}, c.title),
-          el("div",{class:"stamp"}, `Status: ${c.status} · ${c.region||''} · ${c.date}`),
-          el("div",{}, c.text),
-          el("div",{class:"proof"}, "Nächster Schritt: " + (c.next||"–"))
-        ]));
-      });
+      const c=recent[0];
+      host.appendChild(el("div",{class:"live-item"},[
+        el("strong",{}, c.title),
+        el("div",{class:"stamp"}, `Status: ${c.status} · ${c.region||''} · ${c.date}`),
+        el("div",{}, c.text),
+        el("div",{class:"proof"}, "Nächster Schritt: " + (c.next||"–"))
+      ]));
     }
 
     function statusClass(s){return s==="Entwurf"?"status-entwurf":s==="In Arbeit"?"status-inarbeit":s==="beschlossen"?"status-beschlossen":""}
@@ -445,7 +435,7 @@ footer{border-top:1px solid var(--border);background:#fff}
       return article;
     }
 
-    // Microtransition (FLIP) für Re-Ordering
+    // Microtransition (FLIP)
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function getPositions(container){
       const pos={};
