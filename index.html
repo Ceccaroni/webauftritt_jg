@@ -360,22 +360,23 @@
       host.setAttribute("aria-busy","false");
     }
 
-    // About-Toggle
+    // About-Toggle (zeigen/verstecken, Hash & ARIA pflegen)
     const aboutBtn = $("#aboutBtn");
     const aboutSection = $("#ueber-mich");
-    function showAbout(){
-      if(!aboutSection.classList.contains("is-visible")){
-        aboutSection.classList.add("is-visible");
-        aboutBtn.setAttribute("aria-expanded","true");
-        // sanft zum Block scrollen
-        aboutSection.scrollIntoView({behavior:"smooth", block:"start"});
+    function setAbout(visible){
+      aboutSection.classList.toggle("is-visible", visible);
+      aboutBtn.setAttribute("aria-expanded", String(visible));
+      if(visible){
         history.replaceState(null,"","#ueber-mich");
+        aboutSection.scrollIntoView({behavior:"smooth", block:"start"});
+      }else{
+        history.replaceState(null,"", location.pathname + location.search);
+        aboutBtn.focus();
       }
     }
-    function maybeOpenFromHash(){
-      if(location.hash === "#ueber-mich"){ showAbout(); }
-    }
-    aboutBtn.addEventListener("click", showAbout);
+    function toggleAbout(){ setAbout(!aboutSection.classList.contains("is-visible")); }
+    function maybeOpenFromHash(){ setAbout(location.hash === "#ueber-mich"); }
+    aboutBtn.addEventListener("click", toggleAbout);
     window.addEventListener("hashchange", maybeOpenFromHash);
 
     // Suche / CTAs
