@@ -1,3 +1,5 @@
+Rolle: **Frontend Performance & Accessibility Engineer**
+
 <!doctype html>
 
 <html lang="de-CH">
@@ -36,7 +38,7 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .hero p{margin:.25rem 0 0 0;color:#2c2c2c;max-width:70ch}
 .hero .tile{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.9rem}
 
-/* Über mich: initial versteckt, nur bei .is-visible zeigen */
+/* Über mich */
 .about{display:none;margin:.25rem 0 0 0}
 .about.is-visible{display:block}
 .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;padding:.75rem 0}
@@ -61,12 +63,15 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .search{display:flex;gap:.5rem;align-items:center}
 .search input{width:100%;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
 .chips{display:flex;flex-wrap:wrap;gap:.5rem}
-.chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem}
-.chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent}
+.chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem;transition:transform .15s ease, background .15s ease, color .15s ease}
+.chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent;transform:translateY(-1px)}
 
 /* Karten-Grid */
-.masonry{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--col-gap);align-items:start;margin:1rem auto 2rem auto}
-.card{break-inside:avoid;background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);margin:0;box-shadow:var(--shadow);overflow:hidden;width:100%;display:inline-block}
+.masonry{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--col-gap);align-items:start;margin:1rem auto 2rem auto;position:relative}
+.card{break-inside:avoid;background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);margin:0;box-shadow:var(--shadow);overflow:hidden;width:100%;display:inline-block;opacity:1;transform:translateY(0);transition:opacity .24s ease, transform .24s ease}
+.card.enter{opacity:0;transform:translateY(6px)}
+.card.enter-active{opacity:1;transform:translateY(0)}
+.card.fade-out{opacity:0;transform:translateY(6px)}
 .card .body{padding:.95rem .95rem 1rem .95rem}
 .card h3{margin:.1rem 0 .35rem 0;font-size:1.1rem;line-height:1.3}
 .meta{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.25rem 0 .6rem 0}
@@ -82,6 +87,8 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .actions{display:flex;gap:.5rem;padding:.75rem .95rem;border-top:1px solid var(--border);background:#fafbfc}
 .actions .ghost{appearance:none;background:#fff;border:1px solid var(--border);border-radius:8px;padding:.48rem .7rem;font-size:.95rem;cursor:pointer}
 
+.empty{padding:1rem;border:1px dashed var(--border);border-radius:10px;background:#fff;color:#2b2b2b}
+
 footer{border-top:1px solid var(--border);background:#fff}
 .transparenz{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));padding:1rem 0}
 .tcard{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:.8rem;box-shadow:var(--shadow)}
@@ -91,6 +98,11 @@ footer{border-top:1px solid var(--border);background:#fff}
 .hero-portrait img{width:100%;height:auto;display:block;border-radius:12px;object-fit:cover;aspect-ratio:3/4}
 .card .media img{width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover}
 .card .media.square img{aspect-ratio:1/1}
+
+/* Motion-Preference: reduzieren */
+@media (prefers-reduced-motion: reduce){
+  .card, .chip{transition:none !important}
+}
 
 @media print{
   body{background:#fff;color:#000}
@@ -222,7 +234,7 @@ footer{border-top:1px solid var(--border);background:#fff}
     </div>
   </footer>
 
-  <!-- JSON-LD (unverändert) -->
+  <!-- JSON-LD -->
 
   <script type="application/ld+json" id="events-jsonld">{
     "@context":"https://schema.org","@graph":[
@@ -231,26 +243,17 @@ footer{border-top:1px solid var(--border);background:#fff}
       {"@type":"Event","name":"Sprechstunde auf dem Neumarktplatz","startDate":"2025-10-10T12:15:00+02:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"Neumarktplatz Brugg","address":{"@type":"PostalAddress","addressLocality":"Brugg","addressCountry":"CH"}},"description":"Kurze Gespräche zu Bildung, Verkehr, Energie.","organizer":{"@type":"Person","name":"Julia Grieder"},"url":"https://example.ch/termine/sprechstunde-neumarkt"}]}</script>
 
   <script>
-    /* --- SAFETY: Entferne versehentlich eingefügte Markdown-Backticks ``` --- */
+    /* Backticks-Sauberkeit: entferne versehentlich eingefügte ``` im DOM */
     document.addEventListener('DOMContentLoaded', () => {
-      const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-      const junk = [];
-      while (walker.nextNode()) {
-        const n = walker.currentNode;
-        if (n.nodeValue && n.nodeValue.trim() === '```') junk.push(n);
-      }
-      junk.forEach(n => n.remove());
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const kill=[]; while(w.nextNode()){ const n=w.currentNode; if(n.nodeValue && n.nodeValue.trim()==='```') kill.push(n); }
+      kill.forEach(n => n.remove());
     });
 
     // Daten
     const DATA = {
       themes: ["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"],
       status: ["Entwurf","In Arbeit","beschlossen"],
-      timeline: [
-        { date:"2025-09-18", text:"Kommission Energie: Fernwärme-Netz – Sozialtarif diskutiert" },
-        { date:"2025-09-17", text:"Bildung: Gespräch Schulleitungen – Entlastungspaket" },
-        { date:"2025-09-16", text:"Mobilität: Veloroute Schule–Bahnhof – Prioritäten gesetzt" }
-      ],
       agenda: [
         { date:"2025-09-26", time:"18:30", title:"Veloroute-Spotcheck Ost", place:"Bahnhof Brugg", purpose:"Lückenanalyse / Quick Wins", ctaLabel:"Details", ctaHref:"https://example.ch/termine/veloroute-spotcheck-ost" },
         { date:"2025-10-03", time:"19:00", title:"Energieforum Quartier Au", place:"Schulhaus Au, Brugg", purpose:"Fernwärme & Sozialtarif erklären", ctaLabel:"Details", ctaHref:"https://example.ch/termine/energieforum-au" },
@@ -258,32 +261,33 @@ footer{border-top:1px solid var(--border);background:#fff}
       ],
       transparency: [],
       cards: [
-        { title:"Velorouten in Brugg sicher machen", status:"In Arbeit", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
+        { id:"c1", title:"Velorouten in Brugg sicher machen", status:"In Arbeit", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
           media:"assets/julia-grieder-aktion.jpg", alt:"Julia Grieder bei einer Begehung der Veloroute in Brugg",
           text:"Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
           next:"Begehung mit Tiefbau, Prioritätenliste freigeben." },
-        { title:"Schulen entlasten – Zeit für Lernen statt Formulare", status:"beschlossen", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
+        { id:"c2", title:"Schulen entlasten – Zeit für Lernen statt Formulare", status:"beschlossen", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
           text:"Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
           next:"Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln." },
-        { title:"Sichere, durchgängige Velorouten", status:"In Arbeit", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
+        { id:"c3", title:"Sichere, durchgängige Velorouten", status:"In Arbeit", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
           text:"Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
           next:"Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten." },
-        { title:"Energie fair: Fernwärme mit Sozialtarif", status:"In Arbeit", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
+        { id:"c4", title:"Energie fair: Fernwärme mit Sozialtarif", status:"In Arbeit", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
           text:"Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
           next:"Werkleitungsgespräch; Tarife mit Nachbargemeinden vergleichen." },
-        { title:"PV-Pflicht für geeignete Dächer", status:"beschlossen", theme:"Energie", region:"Kanton Bern", date:"2025-08-30",
+        { id:"c5", title:"PV-Pflicht für geeignete Dächer", status:"beschlossen", theme:"Energie", region:"Kanton Bern", date:"2025-08-30",
           text:"Genehmigung vereinfacht, Standard bis 30 kW. Leitfaden für Gemeinden folgt.",
           next:"Leitfaden-Entwurf in KW 39 (öffentliche Konsultation)." },
-        { title:"ÖV verlässlicher machen", status:"Entwurf", theme:"Verkehr", region:"Region Emmental", date:"2025-09-05",
+        { id:"c6", title:"ÖV verlässlicher machen", status:"Entwurf", theme:"Verkehr", region:"Region Emmental", date:"2025-09-05",
           text:"Taktverdichtung zu Schulstart/Feierabend, Busspuren an Engstellen, bessere Anschlüsse an S-Bahn.",
           next:"Kosten-Nutzen-Rechnung; Gespräche mit RBS/SBB ansetzen." },
-        { title:"Digitale Teilhabe an Schulen", status:"Entwurf", theme:"Bildung", region:"Kanton Bern", date:"2025-09-02",
+        { id:"c7", title:"Digitale Teilhabe an Schulen", status:"Entwurf", theme:"Bildung", region:"Kanton Bern", date:"2025-09-02",
           text:"Bibliotheken als Lernhubs, Open-Source-Endgeräteverwaltung, Datensparsamkeit.",
           next:"Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch." }
       ]
     };
 
     const $ = s => document.querySelector(s);
+
     function el(tag, attrs={}, children=[]){
       const n=document.createElement(tag);
       for(const [k,v] of Object.entries(attrs)){
@@ -296,23 +300,32 @@ footer{border-top:1px solid var(--border);background:#fff}
       return n;
     }
 
-    // ---- State: Start ohne aktive Kategorien (Themen & Status)
-    const state = { q:"", themes:[], status:[] };
+    // --- STATE: Default = NICHTS AKTIV ---
+    const state = {
+      q: "",
+      themes: new Set(),          // leer = nichts aktiv
+      status: new Set(),
+      themeOrder: []              // Priorität: zuletzt geklickt vorn
+    };
 
     function chip(label, group){
-      const isActive = state[group].includes(label);
-      const c=el("button",{class:"chip","aria-pressed":isActive?"true":"false"},label);
+      const active = state[group]?.has && state[group].has(label);
+      const c=el("button",{class:"chip","aria-pressed":active?"true":"false"},label);
       c.addEventListener("click",()=>{
-        const arr = state[group];
-        const idx = arr.indexOf(label);
-        if(idx === -1){
-          // Neu aktiv: vorn einfügen (höchste Priorität)
-          arr.unshift(label);
-          c.setAttribute("aria-pressed","true");
-        }else{
-          // Deaktivieren
-          arr.splice(idx,1);
+        const pressed=c.getAttribute("aria-pressed")==="true";
+        const set=state[group];
+        if(pressed){
+          // deaktivieren
+          set.delete(label);
           c.setAttribute("aria-pressed","false");
+          if(group==="themes"){ state.themeOrder = state.themeOrder.filter(t => t!==label); }
+        }else{
+          // aktivieren & priorisieren (nach vorn)
+          set.add(label);
+          c.setAttribute("aria-pressed","true");
+          if(group==="themes"){
+            state.themeOrder = [label, ...state.themeOrder.filter(t => t!==label)];
+          }
         }
         render();
       });
@@ -326,7 +339,7 @@ footer{border-top:1px solid var(--border);background:#fff}
       DATA.status.forEach(s=>sWrap.appendChild(chip(s,"status")));
     }
 
-    // ICS/Agenda (unverändert)
+    // ---- Agenda (.ics)
     function pad(n){return n.toString().padStart(2,'0')}
     function toUTCStr(d){return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`}
     function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
@@ -342,7 +355,12 @@ footer{border-top:1px solid var(--border);background:#fff}
         "END:VEVENT","END:VCALENDAR"].join("\r\n");
       return new Blob([ics],{type:"text/calendar;charset=utf-8"});
     }
-    function formatCHDate(dateStr,timeStr){const d=parseLocalDateTime(dateStr,timeStr);const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});const [hh,mm]=(timeStr||'09:00').split(':');return `${fmt.format(d)}, ${hh}.${mm} Uhr`}
+    function formatCHDate(dateStr,timeStr){
+      const d=parseLocalDateTime(dateStr,timeStr);
+      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      const [hh,mm]=(timeStr||'09:00').split(':');
+      return `${fmt.format(d)}, ${hh}.${mm} Uhr`
+    }
     function renderAgenda(){
       const host=$("#miniAgenda"); if(!host) return; host.innerHTML="";
       const items=(DATA.agenda||[]).slice(0,3);
@@ -360,22 +378,24 @@ footer{border-top:1px solid var(--border);background:#fff}
       });
     }
 
-    function renderTransparency(){
-      const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML="";
-      const links=DATA.transparency||[]; if(links.length===0) return;
-      links.forEach(d=>{const parts=[];if(d.title)parts.push(d.title);const meta=[];if(d.source)meta.push(d.source);if(d.date)meta.push(d.date);if(meta.length)parts.push(`(${meta.join(" · ")})`);ul.appendChild(el("li",{},el("a",{href:d.href||"#"},parts.join(" "))))});
-    }
-
+    // Labels & Filter
     function statusClass(s){return s==="Entwurf"?"status-entwurf":s==="In Arbeit"?"status-inarbeit":s==="beschlossen"?"status-beschlossen":""}
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
 
-    function match(c){
+    function matchesFilters(c){
       const q=state.q.trim().toLowerCase();
-      const themesActive = state.themes.length>0;
-      const tOK = themesActive ? state.themes.includes(c.theme) : false; // Standard: nichts anzeigen bis Thema aktiv
-      const sOK = state.status.length===0 ? true : state.status.includes(c.status);
-      const qOK = !q || [c.title,c.text,c.theme,c.region,c.status].join(" ").toLowerCase().includes(q);
+      const tOK = state.themes.size===0 ? false : state.themes.has(c.theme); // nichts aktiv -> nichts anzeigen
+      const sOK = state.status.size===0 || state.status.has(c.status);
+      const qOK=!q||[c.title,c.text,c.theme,c.region,c.status].join(" ").toLowerCase().includes(q);
       return tOK && sOK && qOK;
+    }
+
+    // Sortierung: Priorität nach themeOrder, dann Datum absteigend
+    function sortCards(a,b){
+      const ia = state.themeOrder.indexOf(a.theme);
+      const ib = state.themeOrder.indexOf(b.theme);
+      if(ia!==ib) return ia-ib;
+      return (b.date||"").localeCompare(a.date||"");
     }
 
     function card(c){
@@ -386,41 +406,71 @@ footer{border-top:1px solid var(--border);background:#fff}
       const body=el("div",{class:"body"},[el("h3",{},c.title),meta,el("p",{},c.text),el("p",{class:"next"},"Nächster Schritt: "+c.next)]);
       const media=c.media?el("div",{class:"media"+(c.square?" square":"")},el("img",{src:c.media,alt:c.alt||""})):null;
       const actions=el("div",{class:"actions"},[el("button",{class:"ghost","aria-label":"Als PDF drucken",onclick:()=>window.print()},"PDF-Ansicht")]);
-      return el("article",{class:"card",role:"article","aria-label":c.title},[media,body,actions]);
+      const article = el("article",{class:"card enter",role:"article","aria-label":c.title, id:c.id},[media,body,actions]);
+      requestAnimationFrame(()=>article.classList.add("enter-active"));
+      return article;
     }
 
-    function parseDate(dstr){
-      // YYYY-MM-DD -> Date
-      const [y,m,d]=dstr.split('-').map(Number);
-      return new Date(y,(m||1)-1,d||1);
+    // --- FLIP für sanftes Re-Ordering ---
+    const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function getPositions(container){
+      const pos={};
+      container.querySelectorAll('.card').forEach(el=>{
+        const r=el.getBoundingClientRect();
+        pos[el.id]={top:r.top,left:r.left};
+      });
+      return pos;
+    }
+
+    function animateReorder(container, before, after){
+      if(prefersReduced) return; // respektieren
+      container.querySelectorAll('.card').forEach(el=>{
+        const id=el.id;
+        if(before[id] && after[id]){
+          const dx = before[id].left - after[id].left;
+          const dy = before[id].top  - after[id].top;
+          if(dx || dy){
+            el.style.transform = `translate(${dx}px, ${dy}px)`;
+            el.style.transition = 'transform 0s';
+            requestAnimationFrame(()=>{
+              el.style.transition = 'transform .24s ease';
+              el.style.transform = 'translate(0,0)';
+            });
+          }
+        }
+      });
     }
 
     function render(){
-      const host=$("#masonry"); host.setAttribute("aria-busy","true"); host.innerHTML="";
+      const host=$("#masonry");
+      host.setAttribute("aria-busy","true");
 
-      const filtered = DATA.cards.filter(match);
+      const before = getPositions(host);
 
-      // Sortierung: nach Themen-Priorität (neueste Auswahl zuerst), dann Datum absteigend
-      filtered.sort((a,b)=>{
-        const ai = state.themes.indexOf(a.theme);
-        const bi = state.themes.indexOf(b.theme);
-        if(ai !== bi) return ai - bi;
-        return parseDate(b.date) - parseDate(a.date);
-      });
+      // Build list
+      const list = DATA.cards.filter(matchesFilters).sort(sortCards);
 
-      if(filtered.length===0){
-        const msg = state.themes.length===0
+      // Clear / rebuild
+      host.innerHTML="";
+      if(list.length===0){
+        const msg = state.themes.size===0
           ? "Bitte ein Thema auswählen."
-          : "Keine Treffer mit den aktuellen Filtern.";
-        host.appendChild(el("div",{role:"status","aria-live":"polite",style:"padding:.75rem;color:#2b2b2b"},msg));
-      }else{
-        filtered.forEach(c => host.appendChild(card(c)));
+          : "Kein Ergebnis – Filter anpassen.";
+        host.appendChild(el("div",{class:"empty","role":"status","aria-live":"polite"}, msg));
+        host.setAttribute("aria-busy","false");
+        return;
       }
+      list.forEach(c => host.appendChild(card(c)));
+
+      // After positions for FLIP
+      const after = getPositions(host);
+      animateReorder(host, before, after);
 
       host.setAttribute("aria-busy","false");
     }
 
-    // About-Toggle (zeigen/verstecken, Hash & ARIA pflegen)
+    // About-Toggle
     const aboutBtn = $("#aboutBtn");
     const aboutSection = $("#ueber-mich");
     function setAbout(visible){
@@ -444,10 +494,32 @@ footer{border-top:1px solid var(--border);background:#fff}
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
 
-    // Init
-    buildFilters(); renderAgenda(); renderTransparency(); render(); maybeOpenFromHash();
+    // Initialisieren
+    function renderAgendaInit(){
+      const host=$("#miniAgenda"); if(!host) return;
+      host.innerHTML="";
+      (DATA.agenda||[]).slice(0,3).forEach(it=>{
+        const human=formatCHDate(it.date,it.time);
+        const dtAttr=`${it.date}T${(it.time||'09:00')}:00`;
+        const where=it.place?el("div",{class:"where"},it.place):null;
+        const purpose=it.purpose?el("div",{},it.purpose):null;
+        const icsBlob=makeICSBlob(it); const icsUrl=URL.createObjectURL(icsBlob);
+        const icsName=`JG_${(it.title||"Termin").replace(/\s+/g,'_')}_${it.date||"datum"}.ics`;
+        const icsLink=el("a",{href:icsUrl,download:icsName}, "Kalendereintrag (.ics)");
+        const ctaLink=(it.ctaHref&&it.ctaLabel)?el("a",{href:it.ctaHref},it.ctaLabel):null;
+        const ctas=el("div",{class:"agenda-cta"},[ctaLink,icsLink].filter(Boolean));
+        host.appendChild(el("div",{class:"agenda-item"},[
+          el("div",{class:"agenda-date"},el("time",{datetime:dtAttr},human)),
+          el("div",{class:"agenda-meta"},[el("div",{},it.title||""),where,purpose,ctas].filter(Boolean))
+        ]));
+      });
+    }
+
+    buildFilters();
+    renderAgendaInit();
+    render();
+    maybeOpenFromHash();
   </script>
 
 </body>
 </html>
-::contentReference[oaicite:0]{index=0}
