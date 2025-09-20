@@ -6,25 +6,14 @@
   <title>Geordnete Wildheit – Start</title>
   <meta name="description" content="Seriöser, barrierearmer Auftritt einer Grünen-Politikerin mit lebendigem Kartenraster und klaren Filtern.">
   <style>
-    :root{
-      --brand:#84B414; --brand-ink:#ffffff; --brand-dark:#5a8f00;
-      --bg:#f6f8f5; --paper:#ffffff; --ink:#1a1a1a; --muted:#5d5d5d; --border:#e0e4da; --focus:#0b5fff;
-      --ok:#2e7d32; --warn:#c26500; --danger:#b00020;
-      --radius:12px; --shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.08);
-      --col-gap:1.25rem; --card-gap:1rem; --maxw:1120px; --header-h:72px;
-      --agenda-date-w:330px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+    :root{--brand:#84B414;--brand-ink:#ffffff;--brand-dark:#5a8f00;--bg:#f6f8f5;--paper:#ffffff;--ink:#1a1a1a;--muted:#5d5d5d;--border:#e0e4da;--focus:#0b5fff;--ok:#2e7d32;--warn:#c26500;--danger:#b00020;--radius:12px;--shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.08);--col-gap:1.25rem;--card-gap:1rem;--maxw:1120px;--header-h:72px;--agenda-date-w:330px}
+    *{box-sizing:border-box} html,body{height:100%}
     body{margin:0;font:400 17px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
     a{color:#0a66c2;text-decoration:none} a:hover{text-decoration:underline}
     img{max-width:100%;height:auto;display:block}
-
     .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
     .skip-link:focus{left:1rem;top:1rem;padding:.5rem .75rem;background:#fff;border:2px solid var(--focus);border-radius:6px;z-index:1000}
-
-    :focus{outline:none}
-    :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+    :focus{outline:none} :focus-visible{outline:3px solid var(--focus);outline-offset:2px}
     .btn:focus-visible,.chip:focus-visible,.search input:focus-visible{box-shadow:0 0 0 3px rgba(11,95,255,.25)}
 
     header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--border);backdrop-filter:saturate(1.1) blur(6px)}
@@ -45,9 +34,10 @@
     .hero p{margin:.25rem 0 0 0;color:#2c2c2c;max-width:70ch}
     .hero .tile{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.9rem}
 
-    /* „Über mich“ – eigene Sektion */
-    .about{margin: .25rem 0 0 0;}
-    .about-grid{display:grid;grid-template-columns: 1fr 1fr;gap:1rem;align-items:start;padding: .75rem 0}
+    /* Über mich: initial versteckt, nur bei .is-visible zeigen */
+    .about{display:none;margin:.25rem 0 0 0}
+    .about.is-visible{display:block}
+    .about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;align-items:start;padding:.75rem 0}
     .about .tile{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
     .about h3{margin:.25rem 0 .35rem 0}
     .about p{margin:.25rem 0}
@@ -72,7 +62,7 @@
     .chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem}
     .chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent}
 
-    /* Karten zeilenweise (Grid) */
+    /* Karten-Grid */
     .masonry{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--col-gap);align-items:start;margin:1rem auto 2rem auto}
     .card{break-inside:avoid;background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);margin:0;box-shadow:var(--shadow);overflow:hidden;width:100%;display:inline-block}
     .card .body{padding:.95rem .95rem 1rem .95rem}
@@ -89,10 +79,6 @@
     .body .next{margin-top:.55rem;font-size:.95rem;color:#1f3d1f}
     .actions{display:flex;gap:.5rem;padding:.75rem .95rem;border-top:1px solid var(--border);background:#fafbfc}
     .actions .ghost{appearance:none;background:#fff;border:1px solid var(--border);border-radius:8px;padding:.48rem .7rem;font-size:.95rem;cursor:pointer}
-
-    /* Zeitspur (nicht aktiv im DOM) */
-    .zeitspur{display:flex;gap:.6rem;overflow:auto;padding:.6rem .25rem 0 .25rem;scroll-snap-type:x mandatory}
-    .zeitspur .pill{flex:0 0 auto;min-width:220px;scroll-snap-align:start;background:#fff;border:1px solid var(--border);border-radius:999px;padding:.5rem .8rem;box-shadow:var(--shadow);font-size:.9rem}
 
     footer{border-top:1px solid var(--border);background:#fff}
     .transparenz{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));padding:1rem 0}
@@ -113,11 +99,9 @@
       a{color:#000;text-decoration:underline}
     }
 
-    /* Partei-Badge */
     .party-badge{position:absolute;right:0;top:12px;z-index:60;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:.35rem;display:flex;align-items:center}
     .party-badge img{height:28px;width:auto;display:block;image-rendering:auto}
     @media(max-width:720px){.party-badge{position:static;margin:.5rem 0 0 0} header .brandbar{grid-template-columns:auto auto}}
-
     .brandbar.badge-collide{padding-right:112px}
     @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
     .filters{display:grid;grid-template-columns:auto auto 1fr;gap:.75rem;align-items:end;margin-top:.75rem}
@@ -155,7 +139,7 @@
         <h1>Geordnete Wildheit</h1>
       </div>
       <nav class="cta" aria-label="Hauptaktionen">
-        <a class="btn secondary" href="#ueber-mich" aria-label="Über mich">Über mich</a>
+        <button class="btn secondary" id="aboutBtn" aria-controls="ueber-mich" aria-expanded="false">Über mich</button>
         <button class="btn primary" id="mitmachenBtn" aria-label="Mitmachen">Mitmachen</button>
         <button class="btn secondary" id="newsletterBtn" aria-label="Newsletter">Newsletter</button>
       </nav>
@@ -185,7 +169,7 @@
       </div>
     </section>
 
-    <!-- Über mich (eigene Sektion) -->
+    <!-- Über mich (nur auf Klick sichtbar) -->
     <section id="ueber-mich" class="about" aria-label="Über mich">
       <div class="about-grid wrap">
         <div class="tile">
@@ -228,7 +212,7 @@
     </div>
   </footer>
 
-  <!-- JSON-LD Events (unverändert) -->
+  <!-- JSON-LD (unverändert) -->
   <script type="application/ld+json" id="events-jsonld">{
     "@context":"https://schema.org","@graph":[
       {"@type":"Event","name":"Veloroute-Spotcheck Ost","startDate":"2025-09-26T18:30:00+02:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"Bahnhof Brugg","address":{"@type":"PostalAddress","addressLocality":"Brugg","addressCountry":"CH"}},"description":"Lückenanalyse und Quick Wins priorisieren.","organizer":{"@type":"Person","name":"Julia Grieder"},"url":"https://example.ch/termine/veloroute-spotcheck-ost"},
@@ -252,64 +236,28 @@
       ],
       transparency: [],
       cards: [
-        {
-          title: "Velorouten in Brugg sicher machen",
-          status: "In Arbeit",
-          theme: "Verkehr", region: "Brugg",
-          date: "2025-09-19",
-          media: "assets/julia-grieder-aktion.jpg",
-          alt: "Julia Grieder bei einer Begehung der Veloroute in Brugg",
-          text: "Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
-          next: "Begehung mit Tiefbau, Prioritätenliste freigeben."
-        },
-        {
-          title: "Schulen entlasten – Zeit für Lernen statt Formulare",
-          status: "beschlossen",
-          theme: "Bildung", region: "Kanton Bern",
-          date: "2025-09-12",
-          text: "Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
-          next: "Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln."
-        },
-        {
-          title: "Sichere, durchgängige Velorouten",
-          status: "In Arbeit",
-          theme: "Verkehr", region: "Gemeinde",
-          date: "2025-09-10",
-          text: "Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
-          next: "Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten."
-        },
-        {
-          title: "Energie fair: Fernwärme mit Sozialtarif",
-          status: "In Arbeit",
-          theme: "Energie", region: "Gemeinde",
-          date: "2025-09-18",
-          text: "Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
-          next: "Werkleitungsgespräch; Tarife mit Nachbargemeinden vergleichen."
-        },
-        {
-          title: "PV-Pflicht für geeignete Dächer",
-          status: "beschlossen",
-          theme: "Energie", region: "Kanton Bern",
-          date: "2025-08-30",
-          text: "Genehmigung vereinfacht, Standard bis 30 kW. Leitfaden für Gemeinden folgt.",
-          next: "Leitfaden-Entwurf in KW 39 (öffentliche Konsultation)."
-        },
-        {
-          title: "ÖV verlässlicher machen",
-          status: "Entwurf",
-          theme: "Verkehr", region: "Region Emmental",
-          date: "2025-09-05",
-          text: "Taktverdichtung zu Schulstart/Feierabend, Busspuren an Engstellen, bessere Anschlüsse an S-Bahn.",
-          next: "Kosten-Nutzen-Rechnung; Gespräche mit RBS/SBB ansetzen."
-        },
-        {
-          title: "Digitale Teilhabe an Schulen",
-          status: "Entwurf",
-          theme: "Bildung", region: "Kanton Bern",
-          date: "2025-09-02",
-          text: "Bibliotheken als Lernhubs, Open-Source-Endgeräteverwaltung, Datensparsamkeit.",
-          next: "Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch."
-        }
+        { title:"Velorouten in Brugg sicher machen", status:"In Arbeit", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
+          media:"assets/julia-grieder-aktion.jpg", alt:"Julia Grieder bei einer Begehung der Veloroute in Brugg",
+          text:"Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
+          next:"Begehung mit Tiefbau, Prioritätenliste freigeben." },
+        { title:"Schulen entlasten – Zeit für Lernen statt Formulare", status:"beschlossen", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
+          text:"Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
+          next:"Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln." },
+        { title:"Sichere, durchgängige Velorouten", status:"In Arbeit", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
+          text:"Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
+          next:"Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten." },
+        { title:"Energie fair: Fernwärme mit Sozialtarif", status:"In Arbeit", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
+          text:"Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
+          next:"Werkleitungsgespräch; Tarife mit Nachbargemeinden vergleichen." },
+        { title:"PV-Pflicht für geeignete Dächer", status:"beschlossen", theme:"Energie", region:"Kanton Bern", date:"2025-08-30",
+          text:"Genehmigung vereinfacht, Standard bis 30 kW. Leitfaden für Gemeinden folgt.",
+          next:"Leitfaden-Entwurf in KW 39 (öffentliche Konsultation)." },
+        { title:"ÖV verlässlicher machen", status:"Entwurf", theme:"Verkehr", region:"Region Emmental", date:"2025-09-05",
+          text:"Taktverdichtung zu Schulstart/Feierabend, Busspuren an Engstellen, bessere Anschlüsse an S-Bahn.",
+          next:"Kosten-Nutzen-Rechnung; Gespräche mit RBS/SBB ansetzen." },
+        { title:"Digitale Teilhabe an Schulen", status:"Entwurf", theme:"Bildung", region:"Kanton Bern", date:"2025-09-02",
+          text:"Bibliotheken als Lernhubs, Open-Source-Endgeräteverwaltung, Datensparsamkeit.",
+          next:"Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch." }
       ]
     };
 
@@ -319,7 +267,7 @@
       for(const [k,v] of Object.entries(attrs)){
         if(k==="class") n.className=v;
         else if(k==="dataset"){ for(const [dk,dv] of Object.entries(v)) n.dataset[dk]=dv; }
-        else if(k.startsWith("on") && typeof v==="function"){ n.addEventListener(k.slice(2), v); }
+        else if(k.startsWith("on")&&typeof v==="function"){ n.addEventListener(k.slice(2),v); }
         else if(v!==null && v!==undefined){ n.setAttribute(k,v); }
       }
       (Array.isArray(children)?children:[children]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
@@ -347,12 +295,7 @@
       DATA.status.forEach(s=>sWrap.appendChild(chip(s,"status")));
     }
 
-    function buildTimeline(){
-      const z=$("#zeitspur"); if(!z) return; z.innerHTML="";
-      DATA.timeline.forEach(item=>z.appendChild(el("div",{class:"pill"},`${item.date} – ${item.text}`)));
-    }
-
-    // ICS Helfer
+    // ICS/Agenda (unverändert)
     function pad(n){return n.toString().padStart(2,'0')}
     function toUTCStr(d){return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`}
     function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
@@ -360,40 +303,24 @@
     function makeICSBlob(item){
       const startLocal=parseLocalDateTime(item.date,item.time);
       const endLocal=new Date(startLocal.getTime()+60*60*1000);
-      const ics=[
-        "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//JG Brugg//Agenda//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
+      const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//JG Brugg//Agenda//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
         `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@jg.brugg`,
         `DTSTAMP:${toUTCStr(new Date())}`,`DTSTART:${toUTCStr(startLocal)}`,`DTEND:${toUTCStr(endLocal)}`,
-        `SUMMARY:${escapeICS(item.title||"Termin")}`,
-        `DESCRIPTION:${escapeICS(item.purpose||"")}`,
-        `LOCATION:${escapeICS(item.place||"Brugg")}`,
-        `URL:${escapeICS(item.ctaHref||window.location.href)}`,
+        `SUMMARY:${escapeICS(item.title||"Termin")}`,`DESCRIPTION:${escapeICS(item.purpose||"")}`,
+        `LOCATION:${escapeICS(item.place||"Brugg")}`,`URL:${escapeICS(item.ctaHref||window.location.href)}`,
         "END:VEVENT","END:VCALENDAR"].join("\r\n");
       return new Blob([ics],{type:"text/calendar;charset=utf-8"});
     }
-
-    function formatCHDate(dateStr,timeStr){
-      const d=parseLocalDateTime(dateStr,timeStr);
-      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const [hh,mm]=(timeStr||'09:00').split(':'); return `${fmt.format(d)}, ${hh}.${mm} Uhr`;
-    }
-
+    function formatCHDate(dateStr,timeStr){const d=parseLocalDateTime(dateStr,timeStr);const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});const [hh,mm]=(timeStr||'09:00').split(':');return `${fmt.format(d)}, ${hh}.${mm} Uhr`}
     function renderAgenda(){
       const host=$("#miniAgenda"); if(!host) return; host.innerHTML="";
       const items=(DATA.agenda||[]).slice(0,3);
-      if(items.length===0){
-        host.appendChild(el("div",{class:"agenda-item"},[el("div",{class:"agenda-date"},"—"),el("div",{class:"agenda-meta"},"Noch keine Termine publiziert.")]));
-        return;
-      }
+      if(items.length===0){host.appendChild(el("div",{class:"agenda-item"},[el("div",{class:"agenda-date"},"—"),el("div",{class:"agenda-meta"},"Noch keine Termine publiziert.") ]));return;}
       items.forEach(it=>{
-        const human=formatCHDate(it.date,it.time);
-        const dtAttr=`${it.date}T${(it.time||'09:00')}:00`;
-        const where=it.place?el("div",{class:"where"},it.place):null;
-        const purpose=it.purpose?el("div",{},it.purpose):null;
+        const human=formatCHDate(it.date,it.time); const dtAttr=`${it.date}T${(it.time||'09:00')}:00`;
+        const where=it.place?el("div",{class:"where"},it.place):null; const purpose=it.purpose?el("div",{},it.purpose):null;
         const ctaLink=(it.ctaHref&&it.ctaLabel)?el("a",{href:it.ctaHref},it.ctaLabel):null;
-        const icsBlob=makeICSBlob(it); const icsUrl=URL.createObjectURL(icsBlob);
-        const icsName=`JG_${(it.title||"Termin").replace(/\s+/g,'_')}_${it.date||"datum"}.ics`;
-        const icsLink=el("a",{href:icsUrl,download:icsName,"aria-label":`Kalendereintrag herunterladen: ${it.title||'Termin'} – ${human}`},"Kalendereintrag (.ics)");
+        const icsLink=(()=>{const b=makeICSBlob(it);const url=URL.createObjectURL(b);const name=`JG_${(it.title||"Termin").replace(/\s+/g,'_')}_${it.date||"datum"}.ics`;return el("a",{href:url,download:name,"aria-label":`Kalendereintrag herunterladen: ${it.title||'Termin'} – ${human}`},"Kalendereintrag (.ics)")})();
         const ctaWrap=el("div",{class:"agenda-cta"},[ctaLink,icsLink].filter(Boolean));
         host.appendChild(el("div",{class:"agenda-item"},[
           el("div",{class:"agenda-date"},el("time",{datetime:dtAttr},human)),
@@ -405,8 +332,7 @@
     function renderTransparency(){
       const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML="";
       const links=DATA.transparency||[]; if(links.length===0) return;
-      links.forEach(d=>{const parts=[]; if(d.title) parts.push(d.title); const meta=[]; if(d.source) meta.push(d.source); if(d.date) meta.push(d.date);
-        if(meta.length) parts.push(`(${meta.join(" · ")})`); ul.appendChild(el("li",{}, el("a",{href:d.href||"#"},parts.join(" "))));});
+      links.forEach(d=>{const parts=[];if(d.title)parts.push(d.title);const meta=[];if(d.source)meta.push(d.source);if(d.date)meta.push(d.date);if(meta.length)parts.push(`(${meta.join(" · ")})`);ul.appendChild(el("li",{},el("a",{href:d.href||"#"},parts.join(" "))))});
     }
 
     function statusClass(s){return s==="Entwurf"?"status-entwurf":s==="In Arbeit"?"status-inarbeit":s==="beschlossen"?"status-beschlossen":""}
@@ -418,36 +344,47 @@
       const qOK=!q||[c.title,c.text,c.theme,c.region,c.status].join(" ").toLowerCase().includes(q);
       return tOK&&sOK&&qOK;
     }
-
     function card(c){
       const meta=el("div",{class:"meta"},[
         label(c.status,"status-"+statusClass(c.status).split("-")[1]),
-        label(c.theme,"them"),
-        label(c.region||"","region"),
-        label(c.date,"date"),
+        label(c.theme,"them"),label(c.region||"","region"),label(c.date,"date"),
       ]);
-      const body=el("div",{class:"body"},[
-        el("h3",{},c.title),meta,el("p",{},c.text),el("p",{class:"next"},"Nächster Schritt: "+c.next)
-      ]);
+      const body=el("div",{class:"body"},[el("h3",{},c.title),meta,el("p",{},c.text),el("p",{class:"next"},"Nächster Schritt: "+c.next)]);
       const media=c.media?el("div",{class:"media"+(c.square?" square":"")},el("img",{src:c.media,alt:c.alt||""})):null;
       const actions=el("div",{class:"actions"},[el("button",{class:"ghost","aria-label":"Als PDF drucken",onclick:()=>window.print()},"PDF-Ansicht")]);
       return el("article",{class:"card",role:"article","aria-label":c.title},[media,body,actions]);
     }
-
     function render(){
       const host=$("#masonry"); host.setAttribute("aria-busy","true"); host.innerHTML="";
       DATA.cards.filter(match).forEach(c=>host.appendChild(card(c)));
       host.setAttribute("aria-busy","false");
     }
 
+    // About-Toggle
+    const aboutBtn = $("#aboutBtn");
+    const aboutSection = $("#ueber-mich");
+    function showAbout(){
+      if(!aboutSection.classList.contains("is-visible")){
+        aboutSection.classList.add("is-visible");
+        aboutBtn.setAttribute("aria-expanded","true");
+        // sanft zum Block scrollen
+        aboutSection.scrollIntoView({behavior:"smooth", block:"start"});
+        history.replaceState(null,"","#ueber-mich");
+      }
+    }
+    function maybeOpenFromHash(){
+      if(location.hash === "#ueber-mich"){ showAbout(); }
+    }
+    aboutBtn.addEventListener("click", showAbout);
+    window.addEventListener("hashchange", maybeOpenFromHash);
+
     // Suche / CTAs
-    $("#search").addEventListener("input",e=>{state.q=e.target.value||"";render()});
-    $("#mitmachenBtn").addEventListener("click",()=>alert("Mitmachen: kurzes Formular (Demo)."));
-    $("#newsletterBtn").addEventListener("click",()=>alert("Newsletter: DSG-konformer Versand (Demo)."));
+    $("#search").addEventListener("input", e => { state.q = e.target.value || ""; render(); });
+    $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
+    $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
 
     // Init
-    buildFilters(); buildTimeline(); renderAgenda(); renderTransparency(); render();
+    buildFilters(); renderAgenda(); renderTransparency(); render(); maybeOpenFromHash();
   </script>
-
 </body>
 </html>
