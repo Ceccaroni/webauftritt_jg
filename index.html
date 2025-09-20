@@ -66,8 +66,8 @@
       backdrop-filter: saturate(1.1) blur(6px);
     }
     .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
+    header .wrap{ position: relative; } /* ← Badge an die Content-Breite ankern */
     .brandbar{
-      position: relative; /* Positionierungs-Kontext für die Badge */
       display:grid; grid-template-columns: 1fr auto; align-items:center; gap:1rem; min-height: var(--header-h);
     }
     .brand{ display:flex; align-items:center; gap:.75rem; }
@@ -88,8 +88,8 @@
 
     /* Hero nüchtern */
     .hero{
-      background: transparent;   /* Kasten entfernt */
-      border-bottom: none;       /* Linie entfernt */
+      background: transparent;          /* ← Kasten entfernt */
+      border-bottom: none;              /* ← Linie entfernt */
     }
     .hero-grid{
       display:grid; grid-template-columns: 1.2fr .8fr; gap: 1rem; align-items: center; padding: 1.25rem 0;
@@ -147,7 +147,7 @@
     .label.status-beschlossen{ background: #eef4ff; border-color: #ccdbff; }
     .label.them{ background: #f1f7ea; }
     .label.region{ background: #f4f6f8; }
-    .label.date{ background: #fff; color: var(--muted); }
+    .label.date{ background: #fff; color: #888; }
 
     .body p{ margin:.25rem 0 .55rem 0; }
     .body .next{ margin-top:.55rem; font-size:.95rem; color:#1f3d1f; }
@@ -155,7 +155,7 @@
     .actions{ display:flex; gap:.5rem; padding:.75rem .95rem; border-top:1px solid var(--border); background:#fafbfc; }
     .actions .ghost{ appearance:none; background:#fff; border:1px solid var(--border); border-radius:8px; padding:.48rem .7rem; font-size:.95rem; cursor:pointer; }
 
-    /* Zeitspur komprimiert (derzeit nicht im DOM; Guard im JS) */
+    /* Zeitspur (derzeit nicht im DOM; Guard im JS) */
     .zeitspur{ display:flex; gap:.6rem; overflow:auto; padding:.6rem .25rem 0 .25rem; scroll-snap-type:x mandatory; }
     .zeitspur .pill{
       flex:0 0 auto; min-width: 220px; scroll-snap-align:start;
@@ -183,20 +183,50 @@
       aspect-ratio: 1 / 1;
     }
 
+    /* ===== Notizzettel ===== */
+    .notes-wrap{ margin: 1rem 0 1.25rem 0; }
+    .notes-toolbar{
+      display:flex; align-items:center; justify-content: space-between; gap:.75rem; margin:.25rem 0 .5rem 0;
+    }
+    .notes-toolbar h3{ margin:0; font-size:1.05rem; }
+    .btn.small{ padding:.42rem .7rem; font-size:.92rem; border-radius: 10px; }
+    .btn.ghost{ background:#fff; color:#1a1a1a; border:1px solid var(--border); }
+    .notes{
+      display:grid; gap:.75rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    .note{
+      position: relative;
+      background:#fffef6; border:1px solid #ebe7c7; border-radius: 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 10px 24px rgba(0,0,0,.06);
+      padding: .75rem .75rem 1rem .75rem;
+    }
+    .note header{
+      position: static; background:transparent; border:0; backdrop-filter:none;
+      display:flex; align-items:center; justify-content: space-between; gap:.5rem; min-height:auto; padding:0; margin:0 0 .35rem 0;
+    }
+    .note .badge{
+      font-size:.75rem; font-weight:650; padding:.18rem .5rem; border-radius:999px; border:1px solid #e6e2c2; background:#fff9d9; color:#4a4800;
+    }
+    .note .title{ font-weight:700; margin: .1rem 0 .25rem 0; }
+    .note .text{ font-size:.98rem; line-height:1.35; color:#2a2a2a; }
+    .note .btnbar{ margin-top:.5rem; display:flex; gap:.35rem; flex-wrap:wrap; }
+    .note .btnbar .btn{ padding:.32rem .55rem; font-size:.88rem; border-radius:9px; border:1px solid #e6e2c2; background:#fff; }
+    .note .btnbar .btn:hover{ background:#fff9d9; }
+
     @media print{
       body{ background:#fff; color:#000; }
-      .hero, .filters, .actions, .zeitspur{ display:none !important; }
+      .hero, .filters, .actions, .zeitspur, .notes-wrap{ display:none !important; }
       .masonry{ column-count: 2 !important; }
       .card{ border-color:#000; box-shadow:none; }
       .label{ background:#fff !important; border-color:#000; color:#000; }
       a{ color:#000; text-decoration: underline; }
     }
 
-    /* ---- Partei-Badge: an rechte Content-Kante gelockt ---- */
     .party-badge{
-      position: absolute;  /* relativ zur .brandbar (position:relative) */
-      right: 0;            /* rechte Kante = rechte Kante der Wrap/Brandbar */
-      top: 12px;
+      position: absolute;               /* ← an die Wrap-Ecke heften */
+      right: 0;                          /* ← rechte Kante der Content-Breite */
+      top: 12px;                         /* ← im Header positionieren */
       z-index: 60;
       background:#fff; border:1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding:.35rem; display:flex; align-items:center;
     }
@@ -261,12 +291,12 @@
         <button class="btn primary" id="mitmachenBtn" aria-label="Mitmachen">Mitmachen</button>
         <button class="btn secondary" id="newsletterBtn" aria-label="Newsletter">Newsletter</button>
       </nav>
+    </div>
 
-      <!-- Logo dekorativ: aus dem Tab-Fluss, Alt leer -->
-      <div class="party-badge" aria-hidden="true">
-        <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" role="presentation" loading="lazy"
-             onerror="this.onerror=null;this.src='assets/logo-gruene-placeholder.svg';">
-      </div>
+    <!-- Logo dekorativ: aus dem Tab-Fluss, Alt leer -->
+    <div class="party-badge" aria-hidden="true">
+      <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" role="presentation" loading="lazy"
+           onerror="this.onerror=null;this.src='assets/logo-gruene-placeholder.svg';">
     </div>
   </header>
 
@@ -293,7 +323,18 @@
     <section class="filters" aria-label="Filter und Suche">
       <div class="chips" id="themes" role="group" aria-label="Themen"></div>
       <div class="chips" id="status" role="group" aria-label="Status"></div>
-      <div class="search"><input id="search" type="search" placeholder="Suche"></div>
+      <div class="search"><input id="search" type="search" placeholder="Suche" aria-label="Suche"></div>
+    </section>
+
+    <!-- Notizzettel -->
+    <section class="notes-wrap" aria-label="Notizen">
+      <div class="notes-toolbar">
+        <h3>Notizen</h3>
+        <div class="toolbar-actions">
+          <button class="btn small ghost" id="clearNotesBtn" aria-label="Alle Notizen löschen">Alle Notizen löschen</button>
+        </div>
+      </div>
+      <div id="notes" class="notes" aria-live="polite"></div>
     </section>
 
     <!-- Mosaik -->
@@ -316,7 +357,22 @@
         <p class="small">Anliegen kurz schildern. Antwort in der Regel binnen 72h.</p>
       </div>
     </div>
+    <div class="wrap" style="padding: .5rem 0 1rem 0; display:flex; gap:1rem; flex-wrap:wrap;">
+      <a href="#impressum">Impressum</a>
+      <a href="#datenschutz">Datenschutz</a>
+    </div>
   </footer>
+
+  <!-- Platzhalter-Sektionen (simple, später auslagern) -->
+  <section id="impressum" class="wrap" aria-label="Impressum" style="padding: 1rem 0 2rem 0;">
+    <h3>Impressum (Platzhalter)</h3>
+    <p class="small">Verantwortlich: Julia Grieder, Brugg · Kontakt: kontakt@example.ch · Diese Angaben werden nach rechtlicher Prüfung präzisiert und ggf. auf eine eigene Unterseite ausgelagert.</p>
+  </section>
+
+  <section id="datenschutz" class="wrap" aria-label="Datenschutz" style="padding: 0 0 2rem 0;">
+    <h3>Datenschutz (Platzhalter)</h3>
+    <p class="small">Kurzinfo: Es werden nur technisch notwendige Daten verarbeitet. Ausführliche Datenschutzerklärung folgt auf separater Seite.</p>
+  </section>
 
   <!-- JSON-LD für die nächsten Events -->
   <script type="application/ld+json" id="events-jsonld">
@@ -404,8 +460,15 @@
         // { title:"Fernwärme: Protokoll Werkleitung", source:"Gemeinde Brugg", date:"2025-09-12", href:"https://…"},
       ],
 
-      cards: [
+      // Notizzettel – Demo-Inhalte (Buttons sind Platzhalter ohne Funktion)
+      notes: [
+        { id:"n1", category:"Idee", title:"Veloroute: Querung Schachen", text:"Sichtdreiecke prüfen; Kurve entschärfen; Markierung bis Herbst." },
+        { id:"n2", category:"Rückmeldung", title:"Fernwärme-Sozialtarif", text:"Feedback: Einfaches Formular gewünscht. Auf Website nachziehen." },
+        { id:"n3", category:"To-do", title:"Schulen: Entlastung", text:"Vorlage ‚Stundenerfassung light‘ bereitstellen." },
+        { id:"n4", category:"Risiko", title:"Budget 2026", text:"Kostenschätzung Quick Wins <150’000 CHF validieren." }
+      ],
 
+      cards: [
         {
           title: "Über mich – Julia Grieder",
           status: "In Arbeit",
@@ -687,21 +750,53 @@
       return el("article", { class:"card", role:"article", "aria-label": c.title }, [ media, body, actions ]);
     }
 
-    function render(){
+    function renderCards(){
       const host = $("#masonry"); host.setAttribute("aria-busy","true"); host.innerHTML="";
       DATA.cards.filter(match).forEach(c => host.appendChild(card(c)));
       host.setAttribute("aria-busy","false");
     }
 
+    // ---- Notizzettel Rendering ----
+    function renderNotes(){
+      const host = $("#notes");
+      if(!host) return;
+      host.innerHTML = "";
+      (DATA.notes || []).forEach(n => {
+        host.appendChild(
+          el("article", { class:"note", role:"note", "aria-label": n.title }, [
+            el("header", {}, [
+              el("span", { class:"badge" }, n.category || "Notiz"),
+              el("span", { class:"small" }, "") // Platzhalter
+            ]),
+            el("div", { class:"title" }, n.title || ""),
+            el("div", { class:"text" }, n.text || ""),
+            el("div", { class:"btnbar" }, [
+              el("button", { class:"btn", "aria-label":"Anpinnen (inaktiv)" }, "Anpinnen"),
+              el("button", { class:"btn", "aria-label":"Schliessen (inaktiv)" }, "Schliessen"),
+              el("button", { class:"btn", "aria-label":"Kategorie wechseln (inaktiv)" }, "Kategorie")
+            ])
+          ])
+        );
+      });
+    }
+
     // Suche / CTAs
-    $("#search").addEventListener("input", e => { state.q = e.target.value || ""; render(); });
+    $("#search").addEventListener("input", e => { state.q = e.target.value || ""; renderCards(); });
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
+
+    // Notes: „Alle Notizen löschen“
+    $("#clearNotesBtn").addEventListener("click", () => {
+      if(confirm("Wirklich alle Notizen löschen?")){
+        DATA.notes = [];
+        renderNotes();
+      }
+    });
 
     // Initialisieren
     buildFilters(); buildTimeline();
     renderAgenda(); renderTransparency();
-    render();
+    renderNotes(); renderCards();
   </script>
 
 </body>
