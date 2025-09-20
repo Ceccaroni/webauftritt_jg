@@ -79,7 +79,7 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .label.status-beschlossen{background:#eef4ff;border-color:#ccdbff}
 .label.them{background:#f1f7ea}
 .label.region{background:#f4f6f8}
-.label.date{background:#fff;color:var(--muted)}
+.label.date{background:#fff;color:#2c2c2c}
 .body p{margin:.25rem 0 .55rem 0}
 .body .next{margin-top:.55rem;font-size:.95rem;color:#1f3d1f}
 .actions{display:flex;gap:.5rem;padding:.75rem .95rem;border-top:1px solid var(--border);background:#fafbfc}
@@ -118,11 +118,13 @@ footer{border-top:1px solid var(--border);background:#fff}
 @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
 .filters{display:grid;grid-template-columns:auto auto 1fr;gap:.75rem;align-items:end;margin-top:.75rem}
 
+/* Phone: nur Reihenfolge im Hero drehen (Portrait vor Text), Webansicht bleibt gleich */
 @media(max-width:720px){
   .hero-grid{grid-template-columns:1fr;gap:.75rem;padding:.8rem 0}
   .hero .tile{padding:.75rem}
   .hero h2{font-size:1.25rem;line-height:1.25}
   .hero p{font-size:1rem}
+  .hero-portrait{order:-1} /* Portrait zuerst */
   .cta .btn{padding:.5rem .8rem;font-weight:600}
   .brandbar{align-items:start}
   .filters{grid-template-columns:1fr;gap:.6rem;align-items:stretch}
@@ -172,7 +174,7 @@ footer{border-top:1px solid var(--border);background:#fff}
     <!-- Hero -->
     <section class="hero" aria-label="Einstieg">
       <div class="hero-grid wrap">
-        <div>
+        <div class="hero-copy">
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
           <div class="mini-agenda" aria-label="Nächste Termine in Brugg">
@@ -469,8 +471,7 @@ footer{border-top:1px solid var(--border);background:#fff}
 
     // Init
     function renderTransparency(){ const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML=""; (DATA.transparency||[]).forEach(d=>ul.appendChild(el("li",{},el("a",{href:d.href||"#"},d.title||d.href||"Link")))); }
-    function renderAgendaInit(){ renderAgenda(); }
-    buildFilters(); renderAgendaInit(); renderTransparency(); render(); maybeOpenFromHash();
+    buildFilters(); renderAgenda(); renderTransparency(); render(); maybeOpenFromHash();
   </script>
 
 </body>
