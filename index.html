@@ -52,10 +52,24 @@
     .about .portrait{aspect-ratio:3/4;border-radius:12px;object-fit:cover}
 
     /* Filter + Grid */
-    .filters{display:grid;grid-template-columns:1fr auto auto;gap:.75rem;align-items:end;margin-top:.75rem}
+    .filters{
+      display:grid;
+      grid-template-columns:1fr auto minmax(280px, 320px);
+      gap:.75rem; align-items:center; margin-top:.75rem
+    }
     .search{display:flex;gap:.5rem;align-items:center}
     .search input{width:100%;padding:.65rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
-    .chips{display:flex;flex-wrap:wrap;gap:.5rem}
+
+    .chips{
+      display:flex;
+      flex-wrap:nowrap;          /* kein Umbruch */
+      gap:.5rem;
+      overflow:auto;             /* horizontal scrollen bei Platzmangel */
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin
+    }
+    .chips .chip{flex:0 0 auto}  /* Chips behalten Breite, brechen nicht */
+
     .chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem;transition:transform .16s ease, background .16s ease, color .16s ease}
     .chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent;transform:translateY(-1px)}
 
@@ -100,8 +114,9 @@
       .hero .tile{padding:.75rem}
       .hero h2{font-size:1.25rem;line-height:1.25}
       .brandbar{align-items:start}
-      .filters{grid-template-columns:1fr;gap:.6rem;align-items:stretch}
-      .chips{overflow:auto;gap:.45rem;padding-bottom:.25rem;scroll-snap-type:x mandatory}
+      /* Filter bleibt 1 Zeile; nur schmaler */
+      .filters{grid-template-columns:1fr auto minmax(180px, 1fr);gap:.6rem;align-items:center}
+      .chips{gap:.45rem;padding-bottom:.25rem;scroll-snap-type:x mandatory}
       .chips .chip{flex:0 0 auto;scroll-snap-align:start}
       .chips::-webkit-scrollbar{display:none}
       .masonry{margin:.5rem auto 1.25rem auto}
@@ -152,7 +167,7 @@
             </form>
           </div>
 
-          <!-- Nächste Termine: wieder als Kachel -->
+          <!-- Nächste Termine -->
           <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
             <h3>Nächste Termine in Brugg</h3>
             <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
@@ -315,7 +330,7 @@
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
-      const tOK = STATE.themes.size===0 ? false : STATE.themes.has(c.theme);
+      const tOK = STATE.themes.size===0 ? false : STATE.themes.has(c.theme);  // Vereinigung mehrerer Themen
       const sOK = STATE.status.size===0 || STATE.status.has(c.status||"");
       const qOK=!q||[c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
       return tOK && sOK && qOK;
