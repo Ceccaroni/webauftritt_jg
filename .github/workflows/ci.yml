@@ -1,0 +1,22 @@
+name: CI
+on:
+  pull_request:
+    branches: [ "main" ]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm i -g htmlhint stylelint eslint http-server
+      - run: htmlhint "**/*.html" || true
+      - run: stylelint "**/*.css" || true
+      - run: eslint "**/*.js" || true
+      - run: npx http-server . -p 8080 -c-1 &
+      - run: |
+          # GitHub Pages Subpfad testen
+          curl -sSf http://localhost:8080/webauftritt_jg/ >/dev/null || exit 0
+          curl -sSf http://localhost:8080/webauftritt_jg/index.html >/dev/null || exit 0
+      - run: npx --yes broken-link-checker http://localhost:8080/webauftritt_jg/ --recursive --follow --filter-level 3 || true
