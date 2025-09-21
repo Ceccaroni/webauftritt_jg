@@ -73,6 +73,8 @@
     .chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem;transition:transform .16s ease, background .16s ease, color .16s ease}
     .chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent;transform:translateY(-1px)}
 
+    .filter-info{font-size:.9rem;color:#5d5d5d;margin-top:.15rem}
+
     .masonry{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:var(--col-gap);align-items:start;margin:1rem auto 2rem auto;position:relative}
     .card{break-inside:avoid;background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);margin:0;box-shadow:var(--shadow);overflow:hidden;width:100%}
     .card .body{padding:.95rem}
@@ -153,24 +155,24 @@
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
 
-        <!-- Featured -->
-        <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
+          <!-- Featured -->
+          <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
 
-        <!-- LIVE-BOX -->
-        <div class="tile" aria-label="Aktuelles Update">
-          <h3>Diese Woche erledigt</h3>
-          <div id="liveList" class="live-list" aria-live="polite"></div>
-          <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
-            <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
-            <button class="btn secondary" type="submit">Senden</button>
-          </form>
-        </div>
+          <!-- LIVE-BOX -->
+          <div class="tile" aria-label="Aktuelles Update">
+            <h3>Diese Woche erledigt</h3>
+            <div id="liveList" class="live-list" aria-live="polite"></div>
+            <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
+              <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
+              <button class="btn secondary" type="submit">Senden</button>
+            </form>
+          </div>
 
-        <!-- Nächste Termine -->
-        <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
-          <h3>Nächste Termine in Brugg</h3>
-          <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
-        </div>
+          <!-- Nächste Termine -->
+          <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
+            <h3>Nächste Termine in Brugg</h3>
+            <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
+          </div>
         </div>
 
         <div class="tile hero-portrait" aria-label="Porträt">
@@ -202,6 +204,7 @@
       <div class="chips" id="themes" role="group" aria-label="Themen"></div>
       <div class="chips" id="status" role="group" aria-label="Status"></div>
       <div class="search"><input id="search" type="search" placeholder="Suche" aria-label="Suche"></div>
+      <div id="filterInfo" class="filter-info" aria-live="polite"></div>
     </section>
 
     <!-- Kartenraster -->
@@ -240,8 +243,8 @@
     });
 
     const $ = s => document.querySelector(s);
+    const norm = s => (s??"").toString().normalize('NFKC').trim().toLowerCase();
 
-    // Hilfsfunktionen
     function el(tag, attrs={}, children=[]){
       const n=document.createElement(tag);
       for(const [k,v] of Object.entries(attrs)){
@@ -253,8 +256,6 @@
       (Array.isArray(children)?children:[children]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
       return n;
     }
-    const norm = s => (s??"").toString().normalize('NFKC').trim().toLowerCase();
-
     function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
     function formatCHDateLong(dateStr){
       const d=parseLocalDate(dateStr);
@@ -265,7 +266,7 @@
 
     const STATE = { data:null, q:"", themes:new Set(), status:new Set(), themeOrder:[] };
 
-    // Chips (verwenden normalisierte Schlüssel in STATE)
+    // Chips
     function chip(label, group){
       if(!label || (typeof label==="string" && label.trim()==="")) return document.createComment("skip-empty-chip");
       const key = norm(label);
@@ -336,14 +337,13 @@
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
 
-      // Themen: Vereinigung über normalisierte Keys
+      // Themen: Vereinigung über normalisierte Keys (mind. 1 Thema nötig)
       const hasThemeSelection = STATE.themes.size > 0;
-      const cardThemeKey = norm(c.theme);
-      const tOK = hasThemeSelection ? STATE.themes.has(cardThemeKey) : false;
+      const tOK = hasThemeSelection ? STATE.themes.has(norm(c.theme)) : false;
 
-      // Status: nur anwenden, wenn mind. ein Status aktiv ist; Karten ohne Status bleiben sichtbar
+      // Status: strikt UND – nur wenn mind. ein Status aktiv ist
       const hasStatusSelection = STATE.status.size > 0;
-      const sOK = hasStatusSelection ? (c.status ? STATE.status.has(norm(c.status)) : true) : true;
+      const sOK = hasStatusSelection ? (c.status && STATE.status.has(norm(c.status))) : true;
 
       // Suche
       const qOK = !q || [c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
@@ -381,6 +381,24 @@
       ]);
       return el("article",{class:"card",role:"article","aria-label":c.title, id:c.id||("c-"+Math.random().toString(36).slice(2))},[media,body,actions]);
     }
+
+    // Filter-Info
+    function updateFilterInfo(count){
+      const info=$("#filterInfo"); if(!info) return;
+      const themes = Array.from(STATE.themes).map(k=>{
+        // Anzeige mit Original-Label, falls vorhanden
+        const original = (STATE.data?.themes||[]).find(t => norm(t)===k);
+        return original || k;
+      });
+      const statuses = Array.from(STATE.status).map(k=>{
+        const original = (STATE.data?.status||[]).find(s => norm(s)===k);
+        return original || k;
+      });
+      const tPart = themes.length? `Themen: ${themes.join(", ")}` : "Themen: –";
+      const sPart = statuses.length? `Status: ${statuses.join(", ")}` : "Status: –";
+      info.textContent = `${tPart} · ${sPart} · Treffer: ${count}`;
+    }
+
     function render(){
       const host=$("#masonry");
       host.setAttribute("aria-busy","true");
@@ -389,13 +407,15 @@
       if(list.length===0){
         const msg = STATE.themes.size===0 ? "Bitte ein Thema auswählen." : "Kein Ergebnis – Filter anpassen.";
         host.appendChild(el("div",{class:"empty","role":"status","aria-live":"polite"}, msg));
+        updateFilterInfo(0);
         host.setAttribute("aria-busy","false"); return;
       }
       list.forEach(c => host.appendChild(card(c)));
+      updateFilterInfo(list.length);
       host.setAttribute("aria-busy","false");
     }
 
-    // Featured oben neben Porträt
+    // Featured
     function renderFeatured(){
       const host = $("#featuredHost");
       if(!host || !STATE.data) return;
@@ -417,8 +437,8 @@
     }
 
     // Live-Box (letzte 30 Tage)
-    function parseDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim()); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
-    function withinLastDays(iso,days=30){const d=parseDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
+    function parseLocalDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim()); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
+    function withinLastDays(iso,days=30){const d=parseLocalDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
     function renderLive(){
       const host=$("#liveList"); if(!host) return; host.innerHTML="";
       const recent=(STATE.data?.cards||[]).filter(c=>withinLastDays(c.date,30)).sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,1);
