@@ -229,7 +229,7 @@
       </div>
       <div class="tcard">
         <h3>Rechtliches</h3>
-        <p class="small"><a href="./impressum/index.html">Impressum &amp; Datenschutz</a> – jederzeit einsehbar.</p>
+        <p class="small"><a href="./impressum/">Impressum &amp; Datenschutz</a> – jederzeit einsehbar.</p>
       </div>
     </div>
   </footer>
@@ -352,19 +352,20 @@
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
 
     // TTL/Archivierung
+    function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
     function daysBetween(a,b){const MS=24*60*60*1000;return Math.floor((a-b)/MS);}
     function partitionCards(rawCards){
       const now = new Date();
       const byId = new Map(rawCards.map(c => [c.id, c]));
       const archivedIds = new Set();
 
-      // 1) Supersedes: wenn Karte neuere ersetzt, ältere sofort ins Archiv
+      // 1) Supersedes: neuere ersetzt ältere sofort
       rawCards.forEach(c=>{
         const arr = Array.isArray(c.supersedes)? c.supersedes : [];
         arr.forEach(id => { if(byId.has(id)) archivedIds.add(id); });
       });
 
-      // 2) Fortsetzung gleicher Sachverhalt: gleiches theme+region → nur neueste bleibt
+      // 2) Gleiches theme+region → nur neueste bleibt
       const groups = new Map();
       rawCards.forEach(c=>{
         const key = `${norm(c.theme)}|${norm(c.region||"")}`;
@@ -387,16 +388,13 @@
         if(age>ttl) archivedIds.add(c.id);
       });
 
-      // Kandidaten für Front
-      let front = rawCards.filter(c => !archivedIds.has(c.id));
-
       // 4) Kapazitätsbremse Front: max. 8 (neueste zuerst)
+      let front = rawCards.filter(c => !archivedIds.has(c.id));
       front.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
       const limited = front.slice(0,8);
       const limitedIds = new Set(limited.map(c=>c.id));
       front.forEach(c=>{ if(!limitedIds.has(c.id)) archivedIds.add(c.id); });
 
-      // Ergebnis
       const archived = rawCards.filter(c => archivedIds.has(c.id));
       return {front: limited, archived};
     }
@@ -478,7 +476,7 @@
       host.setAttribute("aria-busy","false");
     }
 
-    // Featured (nimmt aus allen Karten; wenn archviert, bleibt oben optional sichtbar – Produktentscheid: hier nur Front)
+    // Featured
     function renderFeatured(){
       const host = $("#featuredHost");
       if(!host) return;
@@ -499,7 +497,7 @@
       host.innerHTML=""; host.appendChild(box); host.style.display='';
     }
 
-    // Live-Box (letzte 30 Tage) — bleibt unberührt und zieht aus ALLEN Karten
+    // Live-Box (unverändert)
     function parseLocalDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso?.trim?.()||""); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
     function withinLastDays(iso,days=30){const d=parseLocalDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
     function renderLive(){
@@ -520,24 +518,12 @@
       ]));
     }
 
-    // About / Suche
-    const aboutBtn = $("#aboutBtn");
-    const aboutSection = $("#ueber-mich");
-    function setAbout(v){aboutSection.classList.toggle("is-visible", v);aboutBtn.setAttribute("aria-expanded", String(v)); if(v){history.replaceState(null,"","#ueber-mich");aboutSection.scrollIntoView({behavior:"smooth", block:"start"});}else{history.replaceState(null,"", location.pathname + location.search);aboutBtn.focus();}}
-    function toggleAbout(){ setAbout(!aboutSection.classList.contains("is-visible")); }
-    function maybeOpenFromHash(){ setAbout(location.hash === "#ueber-mich"); }
-    aboutBtn.addEventListener("click", toggleAbout);
-    window.addEventListener("hashchange", maybeOpenFromHash);
-    $("#search").addEventListener("input", e => { STATE.q = e.target.value || ""; render(); });
-    $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
-    $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
-
     // Transparenz
     function renderTransparency(){
       const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML="";
       (STATE.data?.transparency||[]).forEach(d=>{const t=d.title||d.href||"Link"; ul.appendChild(el("li",{},el("a",{href:d.href||"#"},t)))});}
 
-    // Partition anwenden und alles zeichnen
+    // Partition anwenden
     function applyPartition(){
       const raw = Array.isArray(STATE.data?.cards) ? STATE.data.cards.slice() : [];
       const {front, archived} = partitionCards(raw);
