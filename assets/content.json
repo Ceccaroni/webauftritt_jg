@@ -15,6 +15,17 @@
   "transparency": [],
   "cards": [
     {
+      "id": "c-schule-neu-denken-box-oeffnen-20250921",
+      "title": "Schule neu denken - Box öffnen",
+      "theme": "Bildung",
+      "region": "Brugg",
+      "date": "2025-09-21",
+      "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "next": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "media": "assets/images/deppen1.png",
+      "alt": "Wenn man überholt wird von der Entwicklung..."
+    },
+    {
       "id": "c1",
       "title": "Velorouten in Brugg sicher machen",
       "theme": "Verkehr",
@@ -80,15 +91,4 @@
       "next": "Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch."
     }
   ]
-}
-{
-  "id": "c-schule-neu-denken-box-oeffnen-20250921",
-  "title": "Schule neu denken - Box öffnen",
-  "theme": "Bildung",
-  "region": "Brugg",
-  "date": "2025-09-21",
-  "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-  "next": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-  "media": "assets/images/deppen1.png",
-  "alt": "Wenn man überholt wird von der Entwicklung..."
 }
