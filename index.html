@@ -22,36 +22,24 @@
     .brand{display:flex;align-items:center;gap:.75rem}
     .brand .mark{width:40px;height:40px;border-radius:10px;background:var(--brand);box-shadow:inset 0 0 0 2px #fff,0 1px 2px rgba(0,0,0,.08)}
     .brand h1{margin:0;font-size:1.1rem;font-weight:700;letter-spacing:.2px}
-
-    /* Desktop-CTA */
     .cta{display:flex;gap:.5rem}
     .btn{appearance:none;border:1px solid transparent;border-radius:999px;padding:.6rem .95rem;font-weight:650;cursor:pointer;box-shadow:var(--shadow)}
     .btn.primary{background:var(--brand-dark);color:var(--brand-ink)} .btn.primary:hover{filter:brightness(.98)}
     .btn.secondary{background:#fff;color:#000;border:1px solid var(--border)}
 
-    /* Burger (mobil) */
-    .burger{display:none;appearance:none;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.55rem .7rem;line-height:1;cursor:pointer}
-    .burger:focus-visible{box-shadow:0 0 0 3px rgba(11,95,255,.25)}
-    .burger svg{display:block}
-    .mobile-nav{
-      position:fixed; inset:0 0 auto 0; top:var(--header-h);
-      background:#fff; border-top:1px solid var(--border);
-      box-shadow:0 12px 24px rgba(0,0,0,.08);
-      display:none;
-    }
-    .mobile-nav.is-open{display:block}
-    .mobile-nav .menu{display:grid; gap:.5rem; padding:1rem}
-    .mobile-nav .menu .row{display:flex; gap:.5rem; flex-wrap:wrap}
-    .mobile-nav .menu a{display:inline-block}
-    .mobile-nav .divider{height:1px;background:var(--border);margin:.25rem 0}
-
     /* Hero */
     .hero{background:transparent;border-bottom:none}
-    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:1rem;align-items:start;padding:1.25rem 0}
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      grid-template-areas:"copy portrait";
+      gap:1rem;align-items:start;padding:1.25rem 0
+    }
+    .hero-copy{grid-area:copy;display:grid;gap:.75rem}
+    .hero-portrait{grid-area:portrait}
     .hero h2{margin:.25rem 0 .25rem 0;font-size:1.45rem}
     .hero p{margin:.25rem 0 0 0;color:#2c2c2c;max-width:70ch}
     .tile{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.9rem}
-    .hero-copy{display:grid;gap:.75rem}
 
     /* Featured */
     .featured{display:grid;grid-template-columns:96px 1fr;gap:.75rem;align-items:center}
@@ -129,15 +117,19 @@
     @media(max-width:900px){
       .party-badge{position:static;margin:.5rem 0 0 0}
       header .brandbar{grid-template-columns:auto auto}
-      /* Desktop-CTA ausblenden, Burger einblenden */
-      .cta{display:none}
-      .burger{display:inline-flex;align-items:center;justify-content:center}
+      /* CTA bleibt sichtbar; kein Burger-Menü */
     }
     .brandbar.badge-collide{padding-right:112px}
-    @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
-
     @media(max-width:720px){
-      .hero-grid{grid-template-columns:1fr;gap:.75rem;padding:.8rem 0}
+      .brandbar.badge-collide{padding-right:0}
+      /* In Phone-Ansicht Porträt zuerst */
+      .hero-grid{
+        grid-template-columns:1fr;
+        grid-template-areas:
+          "portrait"
+          "copy";
+        gap:.75rem;padding:.8rem 0
+      }
       .hero .tile{padding:.75rem}
       .hero h2{font-size:1.25rem;line-height:1.25}
       .brandbar{align-items:start}
@@ -159,47 +151,30 @@
         <div class="mark" aria-hidden="true"></div>
         <h1>Geordnete Wildheit</h1>
       </div>
-
-      <!-- Desktop-CTA -->
       <nav class="cta" aria-label="Hauptaktionen">
         <button class="btn secondary" id="aboutBtn" aria-controls="ueber-mich" aria-expanded="false">Über mich</button>
         <button class="btn primary" id="mitmachenBtn" aria-label="Mitmachen">Mitmachen</button>
         <button class="btn secondary" id="newsletterBtn" aria-label="Newsletter">Newsletter</button>
       </nav>
-
-      <!-- Burger (nur mobil sichtbar) -->
-      <button class="burger" id="burgerBtn" aria-label="Menü öffnen" aria-controls="mobileMenu" aria-expanded="false">
-        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
-        </svg>
-      </button>
-
       <div class="party-badge" aria-hidden="true">
         <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" loading="lazy"
              onerror="this.onerror=null;this.src='assets/logos/logo-gruene-placeholder.svg';">
       </div>
     </div>
-
-    <!-- Mobile-Menü-Panel -->
-    <nav id="mobileMenu" class="mobile-nav" aria-label="Mobilmenü">
-      <div class="menu wrap">
-        <div class="row">
-          <button class="btn secondary" id="mAboutBtn" aria-controls="ueber-mich">Über mich</button>
-          <button class="btn primary" id="mMitmachenBtn">Mitmachen</button>
-          <button class="btn secondary" id="mNewsletterBtn">Newsletter</button>
-        </div>
-        <div class="divider" role="presentation"></div>
-        <div class="row">
-          <a class="btn secondary" href="./impressum/">Impressum &amp; Datenschutz</a>
-        </div>
-      </div>
-    </nav>
   </header>
 
   <main id="main" class="wrap" role="main">
     <!-- Hero -->
     <section class="hero" aria-label="Einstieg">
       <div class="hero-grid wrap">
+        <!-- Porträt zuerst auf Phone dank grid-areas -->
+        <div class="tile hero-portrait" aria-label="Porträt">
+          <a href="assets/images/julia-grieder-portraet.png" target="_blank" rel="noopener" aria-label="Porträt in neuem Tab öffnen">
+            <img src="assets/images/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager"
+                 onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
+          </a>
+        </div>
+
         <div class="hero-copy">
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
@@ -222,13 +197,6 @@
             <h3>Nächste Termine in Brugg</h3>
             <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
           </div>
-        </div>
-
-        <div class="tile hero-portrait" aria-label="Porträt">
-          <a href="assets/images/julia-grieder-portraet.png" target="_blank" rel="noopener" aria-label="Porträt in neuem Tab öffnen">
-            <img src="assets/images/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager"
-                 onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
-          </a>
         </div>
       </div>
     </section>
@@ -613,31 +581,6 @@
     $("#search").addEventListener("input", e => { STATE.q = e.target.value || ""; render(); });
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
-
-    // Burger-Menü Logik (mobil)
-    const burgerBtn = $("#burgerBtn");
-    const mobileMenu = $("#mobileMenu");
-    function setMenu(open){
-      mobileMenu.classList.toggle("is-open", open);
-      burgerBtn.setAttribute("aria-expanded", String(open));
-      burgerBtn.setAttribute("aria-label", open ? "Menü schliessen" : "Menü öffnen");
-    }
-    burgerBtn?.addEventListener("click", ()=>{
-      const open = mobileMenu.classList.contains("is-open");
-      setMenu(!open);
-    });
-    document.addEventListener("click",(e)=>{
-      if(!mobileMenu.classList.contains("is-open")) return;
-      const within = mobileMenu.contains(e.target) || burgerBtn.contains(e.target);
-      if(!within) setMenu(false);
-    });
-    document.addEventListener("keydown",(e)=>{
-      if(e.key==="Escape" && mobileMenu.classList.contains("is-open")) setMenu(false);
-    });
-    // Mobile-Aktionen (spiegeln Desktop)
-    $("#mAboutBtn")?.addEventListener("click", ()=>{ setMenu(false); setAbout(true); });
-    $("#mMitmachenBtn")?.addEventListener("click", ()=>{ setMenu(false); alert("Mitmachen: kurzes Formular (Demo)."); });
-    $("#mNewsletterBtn")?.addEventListener("click", ()=>{ setMenu(false); alert("Newsletter: DSG-konformer Versand (Demo)."); });
   </script>
 </body>
 </html>
