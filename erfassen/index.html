@@ -17,7 +17,7 @@
     @media (max-width:880px){ .grid{grid-template-columns:1fr} }
     .card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
     label{display:block;font-weight:600;margin:.5rem 0 .25rem 0}
-    input[type="text"], input[type="date"], textarea, select{width:100%;padding:.6rem .7rem;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
+    input[type="text"], input[type="date"], input[type="time"], textarea, select{width:100%;padding:.6rem .7rem;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
     textarea{min-height:110px;resize:vertical}
     .row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
     .help{color:var(--muted);font-size:.92rem}
@@ -37,13 +37,16 @@
     .hr{height:1px;background:var(--border);margin:.75rem 0}
     .gate{position:fixed;inset:0;background:rgba(246,248,245,.96);display:flex;align-items:center;justify-content:center;z-index:1000}
     .gate .panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1rem;max-width:420px;width:92%}
-    .status{padding:.4rem .6rem;border-radius:8px;border:1px solid var(--border);display:inline-block;margin-top:.5rem}
+    .status{padding:.4rem .6rem;border-radius:8px;border:1px solid var(--border);display:inline-flex;gap:.5rem;align-items:center;margin-top:.5rem}
+    .status small{color:#666}
     .json-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
     .iconbtn{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--border);background:#fff;border-radius:10px;padding:.35rem .55rem;cursor:pointer}
     .iconbtn svg{width:18px;height:18px;flex:0 0 18px}
+    .section-title{margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1rem}
   </style>
 </head>
 <body>
+  <!-- leichter Zutrittsschutz -->
   <div id="gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
     <div class="panel">
       <h2 id="gateTitle">Zutritt</h2>
@@ -59,16 +62,21 @@
 
   <header>
     <div class="wrap">
-      <h1>Erfassungsmaske für neue Karte</h1>
+      <h1>Erfassungsmaske</h1>
       <p class="help">Die Seite lädt die aktuelle <code>assets/content.json</code>, ergänzt deinen Eintrag und bietet die fertige Datei zum Download oder Kopieren an.</p>
-      <div id="loadStatus" class="status">Lade content.json …</div>
+      <div id="loadStatus" class="status">
+        <span>Initialisiere …</span>
+        <button id="reload" class="iconbtn" type="button" title="Live neu laden">Neu laden</button>
+        <small id="stamp"></small>
+      </div>
     </div>
   </header>
 
   <main class="wrap" aria-live="polite">
     <div class="grid">
-      <section class="card" aria-label="Eingabe">
-        <h2>Eingabe</h2>
+      <!-- Karten-Eingabe -->
+      <section class="card" aria-label="Neue Karte erfassen">
+        <h2>Karte erfassen</h2>
 
         <label for="title">Titel *</label>
         <input id="title" type="text" placeholder="z. B. Velorouten in Brugg sicher machen" required>
@@ -91,14 +99,27 @@
             <div id="dateHuman" class="help"></div>
           </div>
           <div>
-            <label for="image">Bild-Datei (Pfad) </label>
-            <input id="image" type="text" placeholder="assets/images/dateiname.jpg oder nur dateiname.jpg">
-            <div class="help">Dateiname allein genügt; wird automatisch zu <code>assets/images/&lt;datei&gt;</code>.</div>
+            <label for="image">Bild-Datei (optional)</label>
+            <input id="image" type="text" placeholder="assets/images/datei.jpg oder nur datei.jpg">
+            <div class="help">Dateiname allein genügt; wird zu <code>assets/images/&lt;datei&gt;</code>.</div>
           </div>
         </div>
 
         <label for="alt">Bild-Alttext</label>
         <input id="alt" type="text" placeholder="Was ist auf dem Bild zu sehen?">
+
+        <!-- NEU: Dokument-Anhang -->
+        <div class="row">
+          <div>
+            <label for="doc">Dokument-Datei (PDF/DOCX, optional)</label>
+            <input id="doc" type="text" placeholder="assets/docs/datei.pdf oder nur datei.pdf">
+            <div class="help">Dateiname allein genügt; wird zu <code>assets/docs/&lt;datei&gt;</code>.</div>
+          </div>
+          <div>
+            <label for="docLabel">Dokument-Anzeigename</label>
+            <input id="docLabel" type="text" placeholder="z. B. Beschlussvorlage PDF">
+          </div>
+        </div>
 
         <label for="text">Kurztext *</label>
         <textarea id="text" placeholder="2–3 Sätze, klar und konkret." required></textarea>
@@ -109,60 +130,104 @@
         <div class="row" style="align-items:center">
           <div>
             <label><input id="featured" type="checkbox"> Als Top-Beitrag (featured) anzeigen</label>
-            <div class="help">Wird oben neben dem Porträt als „Featured“ gezeigt.</div>
+            <div class="help">Wird oben neben dem Porträt gezeigt.</div>
           </div>
         </div>
 
         <div class="actions">
           <button class="primary" id="btnPreview">Eintrag erzeugen</button>
           <button id="btnDownloadCard" disabled>Nur Eintrag als JSON</button>
-          <button id="btnDownloadContent" disabled>content.json aktualisiert</button>
-          <button id="btnCopyMerged" disabled>Kopieren: ganze content.json</button>
+          <button id="btnDownloadContent" disabled>content.json aktualisiert (Karten)</button>
+          <button id="btnCopy" class="iconbtn" disabled>Eintrag kopieren</button>
+          <button id="btnCopyMerged" class="iconbtn" disabled>Ganze content.json kopieren</button>
           <button id="btnReset" type="button">Zurücksetzen</button>
         </div>
 
         <p id="msg" class="help"></p>
-        <div class="hr"></div>
 
-        <h2>Optional: content.json lokal einlesen</h2>
-        <div>
-          <input id="file" type="file" accept="application/json" />
-          <p class="help">Falls der Live-Abruf blockiert ist, kannst du hier eine lokale <code>content.json</code> wählen. Sie wird als Basis verwendet.</p>
+        <div class="section-title">
+          <h2>Vorschau</h2>
+          <div id="preview" class="preview">
+            <p class="help">Noch kein Eintrag erzeugt.</p>
+          </div>
+
+          <div class="json-head">
+            <h2 style="margin:0">JSON-Eintrag</h2>
+          </div>
+          <pre id="out">{}</pre>
         </div>
       </section>
 
-      <section class="card" aria-label="Vorschau und Ergebnis">
-        <h2>Vorschau</h2>
-        <div id="preview" class="preview">
-          <p class="help">Noch kein Eintrag erzeugt.</p>
+      <!-- Termine-Eingabe -->
+      <section class="card" aria-label="Neuen Termin erfassen">
+        <h2>Termin erfassen (Agenda)</h2>
+
+        <label for="evTitle">Titel *</label>
+        <input id="evTitle" type="text" placeholder="z. B. Veloroute-Spotcheck Ost" required>
+
+        <div class="row">
+          <div>
+            <label for="evDate">Datum *</label>
+            <input id="evDate" type="date" required>
+            <div id="evDateHuman" class="help"></div>
+          </div>
+          <div>
+            <label for="evTime">Zeit *</label>
+            <input id="evTime" type="time" value="18:30" required>
+          </div>
         </div>
 
-        <div class="json-head">
-          <h2 style="margin:0">JSON-Eintrag</h2>
-          <button id="btnCopy" class="iconbtn" aria-label="JSON-Eintrag kopieren" title="JSON kopieren" disabled>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
-            Kopieren
-          </button>
+        <label for="evPlace">Ort</label>
+        <input id="evPlace" type="text" placeholder="z. B. Bahnhof Brugg">
+
+        <label for="evPurpose">Zweck / Beschreibung</label>
+        <textarea id="evPurpose" placeholder="Kurz beschreiben, was passiert."></textarea>
+
+        <div class="row">
+          <div>
+            <label for="evCtaLabel">CTA-Label</label>
+            <input id="evCtaLabel" type="text" placeholder="z. B. Details">
+          </div>
+          <div>
+            <label for="evCtaHref">CTA-Link</label>
+            <input id="evCtaHref" type="text" placeholder="https://…">
+          </div>
         </div>
-        <pre id="out">{}</pre>
+
+        <div class="actions">
+          <button class="primary" id="btnPreviewEvent">Termin erzeugen</button>
+          <button id="btnDownloadAgenda" disabled>content.json aktualisiert (Agenda)</button>
+          <button id="btnCopyMergedAgenda" class="iconbtn" disabled>Ganze content.json kopieren</button>
+          <button id="btnResetEvent" type="button">Zurücksetzen</button>
+        </div>
+
+        <p id="evMsg" class="help"></p>
+
+        <div class="section-title">
+          <h2>Vorschau</h2>
+          <div id="evPreview" class="preview">
+            <p class="help">Noch kein Termin erzeugt.</p>
+          </div>
+
+          <div class="json-head">
+            <h2 style="margin:0">JSON-Termin</h2>
+          </div>
+          <pre id="evOut">{}</pre>
+        </div>
       </section>
     </div>
 
     <section class="card" style="margin-top:1rem">
-      <h2>Ablauf</h2>
-      <ol>
-        <li>„Eintrag erzeugen“ klicken.</li>
-        <li><strong>content.json aktualisiert</strong> downloaden oder „Kopieren: ganze content.json“ nutzen.</li>
-        <li>Datei im Repo unter <code>assets/content.json</code> ersetzen.</li>
-        <li>Falls ein Bildpfad gesetzt ist: Bild nach <code>assets/images/</code> hochladen.</li>
-        <li>Seite hart neu laden: Cmd-Shift-R.</li>
-      </ol>
-      <p class="help">Alte Einträge bleiben erhalten. Der neue Eintrag wird oben ergänzt. Dubletten (gleiche <code>id</code> oder gleicher Titel+Datum) werden verhindert.</p>
+      <h2>Basisdaten</h2>
+      <div class="actions">
+        <input id="file" type="file" accept="application/json">
+        <span class="help">Alternativ lokale <code>content.json</code> wählen (wird als Basis verwendet).</span>
+      </div>
     </section>
   </main>
 
   <script>
-    // Türchen
+    // leichter Zutritt
     const PASSPHRASE = "brugg";
     const gate = document.getElementById('gate');
     const gateMsg = document.getElementById('gateMsg');
@@ -176,69 +241,96 @@
     // Helfer
     const $ = s => document.querySelector(s);
     const statusEl = document.getElementById('loadStatus');
-    function setStatus(text, cls){ statusEl.textContent=text; statusEl.className='status '+(cls||''); }
+    const stampEl = document.getElementById('stamp');
+    const pad=n=>n.toString().padStart(2,'0');
+
+    function setStatus(text, cls){
+      statusEl.firstElementChild.textContent = text;
+      statusEl.className = 'status '+(cls||'');
+      stampEl.textContent = 'Stand: '+new Date().toLocaleString('de-CH');
+    }
     function slugify(s){ return (s||"").toLowerCase()
       .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/é|è/g,"e")
       .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80); }
+
+    // Pfad-Helfer
     const IMG_EXT=['png','jpg','jpeg','webp','avif','gif'];
-    function hasValidExt(p){ const m=/\.([a-z0-9]{3,4})$/i.exec(p||""); return !!(m && IMG_EXT.includes(m[1].toLowerCase())); }
+    const DOC_EXT=['pdf','docx'];
+    function hasExt(p, list){ const m=/\.([a-z0-9]{3,4})$/i.exec(p||""); return !!(m && list.includes(m[1].toLowerCase())); }
     function isFilename(p){ return /^[^\\/]+\.([a-z0-9]{3,4})$/i.test(p||""); }
     function normaliseImagePath(p){
       if(!p) return "";
-      let v=p.trim();
-      if(!hasValidExt(v)) return "";
+      let v=p.trim(); if(!hasExt(v, IMG_EXT)) return "";
       if(v.startsWith('assets/images/')) return v;
       if(isFilename(v)) return 'assets/images/'+v;
       return "";
     }
-    function download(filename, text){
-      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
-      a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    function normaliseDocPath(p){
+      if(!p) return "";
+      let v=p.trim(); if(!hasExt(v, DOC_EXT)) return "";
+      if(v.startsWith('assets/docs/')) return v;
+      if(isFilename(v)) return 'assets/docs/'+v;
+      return "";
     }
 
-    // content.json laden
+    function download(filename, text){
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
+      a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    }
+    function formatCHDateLong(dateStr){
+      if(!dateStr) return "";
+      const [Y,M,D]=dateStr.split("-").map(Number);
+      const d=new Date(Y,(M||1)-1,(D||1));
+      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1);
+    }
+
+    // content.json laden / neu laden / lokal einlesen
     let CONTENT=null;
     async function fetchLiveContent(){
       const res=await fetch('../assets/content.json',{cache:'no-store'});
       if(!res.ok) throw new Error('HTTP '+res.status);
       return await res.json();
     }
-    (async function init(){
+    async function loadLive(){
       try{
         CONTENT=await fetchLiveContent();
         setStatus('content.json geladen ✓','ok');
+        hydrateThemeSelect();
       }catch(e){
-        setStatus('content.json konnte nicht live geladen werden. Du kannst unten eine lokale Datei wählen.','warn');
-        CONTENT={themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"],status:["Entwurf","In Arbeit","beschlossen"],agenda:[],transparency:[],cards:[]};
+        setStatus('content.json konnte nicht live geladen werden – nutze ggf. lokale Datei.','warn');
+        if(!CONTENT){ CONTENT={themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"],status:["Entwurf","In Arbeit","beschlossen"],agenda:[],transparency:[],cards:[]}; }
+        hydrateThemeSelect();
       }
-      const sel=$("#theme"); sel.innerHTML='<option value="">– bitte wählen –</option>';
-      (CONTENT.themes||[]).forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
-    })();
+    }
+    $("#reload").addEventListener('click', loadLive);
 
-    // Lokale Datei
+    function hydrateThemeSelect(){
+      const sel=$("#theme"); if(!sel) return;
+      sel.innerHTML='<option value="">– bitte wählen –</option>';
+      (CONTENT.themes||[]).forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
+    }
+
+    // lokale Datei
     $("#file").addEventListener('change', async (e)=>{
       const f=e.target.files?.[0]; if(!f) return;
       try{
-        const txt=await f.text();
-        CONTENT=JSON.parse(txt);
-        setStatus('Lokale content.json geladen ✓','ok');
-        const sel=$("#theme"); sel.innerHTML='<option value="">– bitte wählen –</option>';
-        (CONTENT.themes||[]).forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
+        const txt=await f.text(); CONTENT=JSON.parse(txt);
+        setStatus('Lokale content.json geladen ✓','ok'); hydrateThemeSelect();
       }catch(err){ setStatus('Lokale Datei konnte nicht gelesen werden.','err'); }
     });
 
-    // UI
+    // Datum-Previews
     $("#date").addEventListener("input", e=>{
-      const v=e.target.value;
-      if(!v){ $("#dateHuman").textContent=""; return; }
-      const [Y,M,D]=v.split("-").map(Number);
-      const d=new Date(Y,(M||1)-1,(D||1));
-      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      let s=fmt.format(d); s=s.charAt(0).toUpperCase()+s.slice(1);
-      $("#dateHuman").textContent="→ "+s;
+      const v=e.target.value; $("#dateHuman").textContent = v ? "→ "+formatCHDateLong(v) : "";
+    });
+    $("#evDate").addEventListener("input", e=>{
+      const v=e.target.value; $("#evDateHuman").textContent = v ? "→ "+formatCHDateLong(v) : "";
     });
 
-    function buildObject(){
+    // Objekt bauen (Karte)
+    function buildCardObject(){
       const title=$("#title").value.trim();
       const theme=$("#theme").value.trim();
       const region=$("#region").value.trim();
@@ -246,9 +338,12 @@
       const mediaRaw=$("#image").value.trim();
       const media=normaliseImagePath(mediaRaw);
       const alt=$("#alt").value.trim();
+      const docRaw=$("#doc").value.trim();
+      const doc=normaliseDocPath(docRaw);
+      const docLabel=$("#docLabel").value.trim();
       const text=$("#text").value.trim();
       const next=$("#next").value.trim();
-      const featured = $("#featured").checked;
+      const featured=$("#featured").checked;
 
       const errors=[];
       if(!title) errors.push("Titel fehlt");
@@ -257,53 +352,55 @@
       if(!date) errors.push("Datum fehlt");
       if(!text) errors.push("Kurztext fehlt");
       if(!next) errors.push("Nächster Schritt fehlt");
-      if(mediaRaw && !media) errors.push("Bildpfad ungültig (z. B. assets/images/bild.jpg oder nur bild.jpg)");
+      if(mediaRaw && !media) errors.push("Bildpfad ungültig");
+      if(docRaw && !doc) errors.push("Dokument muss .pdf oder .docx sein");
 
       const id="c-"+slugify(title)+"-"+date.replaceAll("-","");
       const obj={id,title,theme,region,date,text,next};
       if(media) obj.media=media;
       if(alt) obj.alt=alt;
       if(featured) obj.featured=true;
+      if(doc){
+        obj.attachments=[{ href: doc, label: docLabel || doc.split('/').pop() }];
+      }
       return {ok:errors.length===0, errors, obj};
     }
 
-    function renderPreview(c){
+    // Vorschau (Karte)
+    function renderCardPreview(c){
       const prev=$("#preview"); prev.innerHTML="";
       const labels=document.createElement("div"); labels.className="labels";
-      const L=(t,cls="")=>{ const s=document.createElement("span"); s.className="label "+cls; s.textContent=t; return s; };
-      labels.append(L(c.theme,"bereich"), L(c.region,"region"));
-      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      let s=fmt.format(new Date(c.date)); s=s.charAt(0).toUpperCase()+s.slice(1);
-      labels.append(L(s,"date"));
+      const tag=(t,cls="")=>{ const s=document.createElement("span"); s.className="label "+cls; s.textContent=t; return s; };
+      labels.append(tag(c.theme,"bereich"), tag(c.region,"region"), tag(formatCHDateLong(c.date),"date"));
       const h3=document.createElement("h3"); h3.textContent=c.title;
       const p1=document.createElement("p"); p1.textContent=c.text;
       const p2=document.createElement("p"); p2.innerHTML="<strong>Nächster Schritt:</strong> "+(c.next||"–");
-      if(c.featured) prev.append(document.createTextNode("Top-Beitrag (featured)"));
-      prev.append(h3,labels,p1,p2);
+      if(c.attachments?.length){ const p3=document.createElement("p"); p3.innerHTML="<strong>Dokument:</strong> "+c.attachments[0].label; prev.append(h3,labels,p1,p2,p3); }
+      else { prev.append(h3,labels,p1,p2); }
     }
 
-    function mergedContent(newObj){
+    // Merge (nur Karten)
+    function mergedContentCard(newObj){
       const base = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
       base.cards = base.cards || [];
-      // Dubletten vermeiden
       base.cards = base.cards.filter(c => !(c.id===newObj.id || (c.title===newObj.title && c.date===newObj.date)));
       base.cards.unshift(newObj);
       return base;
     }
 
-    // Aktionen
+    // Aktionen (Karte)
     $("#btnPreview").addEventListener("click", ()=>{
-      const res=buildObject();
+      const res=buildCardObject();
       const msg=$("#msg");
       if(!res.ok){ msg.textContent="Bitte korrigieren: "+res.errors.join(", ")+".";
         msg.className="err"; return; }
       msg.textContent="Alles plausibel."; msg.className="ok";
       $("#out").textContent=JSON.stringify(res.obj,null,2);
-      $("#btnCopy").disabled=false;
-      renderPreview(res.obj);
+      renderCardPreview(res.obj);
 
       $("#btnDownloadCard").disabled=false;
       $("#btnDownloadContent").disabled=false;
+      $("#btnCopy").disabled=false;
       $("#btnCopyMerged").disabled=false;
 
       $("#btnDownloadCard").onclick=()=>{
@@ -311,31 +408,113 @@
         download(name, JSON.stringify(res.obj,null,2));
       };
       $("#btnDownloadContent").onclick=()=>{
-        const mc = mergedContent(res.obj);
+        const mc = mergedContentCard(res.obj);
         download("content.json", JSON.stringify(mc,null,2));
       };
       $("#btnCopy").onclick=async ()=>{
-        try{
-          await navigator.clipboard.writeText(JSON.stringify(res.obj,null,2));
-          $("#btnCopy").textContent='Kopiert'; setTimeout(()=>{$("#btnCopy").textContent='Kopieren';},1200);
+        try{ await navigator.clipboard.writeText(JSON.stringify(res.obj,null,2));
+          $("#btnCopy").textContent='Kopiert'; setTimeout(()=>{$("#btnCopy").textContent='Eintrag kopieren';},1200);
         }catch(e){ alert('Kopieren nicht erlaubt – bitte manuell markieren.'); }
       };
       $("#btnCopyMerged").onclick=async ()=>{
-        try{
-          const mc = mergedContent(res.obj);
+        try{ const mc=mergedContentCard(res.obj);
           await navigator.clipboard.writeText(JSON.stringify(mc,null,2));
-          $("#btnCopyMerged").textContent='Kopiert'; setTimeout(()=>{$("#btnCopyMerged").textContent='Kopieren: ganze content.json';},1200);
+          $("#btnCopyMerged").textContent='Kopiert'; setTimeout(()=>{$("#btnCopyMerged").textContent='Ganze content.json kopieren';},1200);
         }catch(e){ alert('Kopieren nicht erlaubt – bitte Download nutzen.'); }
       };
     });
 
     $("#btnReset").addEventListener("click", ()=>{
-      document.querySelectorAll('input, textarea, select').forEach(el=>{ if(el.type!=='date') el.value=""; });
-      $("#featured").checked=false;
+      ['title','region','image','alt','doc','docLabel','text','next'].forEach(id=>$("#"+id).value="");
+      $("#theme").value=""; $("#featured").checked=false;
       $("#date").value=""; $("#dateHuman").textContent="";
       $("#out").textContent="{}"; $("#preview").innerHTML='<p class="help">Noch kein Eintrag erzeugt.</p>';
-      $("#msg").textContent=""; $("#btnDownloadCard").disabled=true; $("#btnDownloadContent").disabled=true; $("#btnCopy").disabled=true; $("#btnCopyMerged").disabled=true;
+      $("#msg").textContent="";
+      ["btnDownloadCard","btnDownloadContent","btnCopy","btnCopyMerged"].forEach(id=>$("#"+id).disabled=true);
     });
+
+    // Termin-Objekt
+    function buildEventObject(){
+      const title=$("#evTitle").value.trim();
+      const date=$("#evDate").value;
+      const time=$("#evTime").value || "09:00";
+      const place=$("#evPlace").value.trim();
+      const purpose=$("#evPurpose").value.trim();
+      const ctaLabel=$("#evCtaLabel").value.trim();
+      const ctaHref=$("#evCtaHref").value.trim();
+
+      const errors=[];
+      if(!title) errors.push("Titel fehlt");
+      if(!date) errors.push("Datum fehlt");
+      if(!time) errors.push("Zeit fehlt");
+
+      const obj={ date, time, title };
+      if(place) obj.place=place;
+      if(purpose) obj.purpose=purpose;
+      if(ctaLabel) obj.ctaLabel=ctaLabel;
+      if(ctaHref) obj.ctaHref=ctaHref;
+
+      return {ok:errors.length===0, errors, obj};
+    }
+
+    // Termin-Vorschau
+    function renderEventPreview(eo){
+      const prev=$("#evPreview"); prev.innerHTML="";
+      const h3=document.createElement("h3"); h3.textContent=eo.title;
+      const meta=document.createElement("p"); meta.textContent = formatCHDateLong(eo.date)+", "+(eo.time||"");
+      const p1=document.createElement("p"); p1.textContent = eo.place ? eo.place : "—";
+      const p2=document.createElement("p"); p2.textContent = eo.purpose ? eo.purpose : "—";
+      prev.append(h3,meta,p1,p2);
+    }
+
+    // Merge (nur Agenda)
+    function mergedContentAgenda(newEvent){
+      const base = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
+      base.agenda = base.agenda || [];
+      // Dubletten vermeiden: Titel + Datum + Zeit
+      base.agenda = base.agenda.filter(a => !(a.title===newEvent.title && a.date===newEvent.date && (a.time||"")===(newEvent.time||"")));
+      // Nach Datum absteigend einsortieren: zuerst hinzufügen, danach sortieren
+      base.agenda.unshift(newEvent);
+      base.agenda.sort((a,b)=> (b.date||"").localeCompare(a.date||"") || (b.time||"").localeCompare(a.time||""));
+      return base;
+    }
+
+    // Aktionen (Termin)
+    $("#btnPreviewEvent").addEventListener("click", ()=>{
+      const res=buildEventObject();
+      const msg=$("#evMsg");
+      if(!res.ok){ msg.textContent="Bitte korrigieren: "+res.errors.join(", ")+".";
+        msg.className="err"; return; }
+      msg.textContent="Alles plausibel."; msg.className="ok";
+      $("#evOut").textContent=JSON.stringify(res.obj,null,2);
+      renderEventPreview(res.obj);
+
+      $("#btnDownloadAgenda").disabled=false;
+      $("#btnCopyMergedAgenda").disabled=false;
+
+      $("#btnDownloadAgenda").onclick=()=>{
+        const mc = mergedContentAgenda(res.obj);
+        download("content.json", JSON.stringify(mc,null,2));
+      };
+      $("#btnCopyMergedAgenda").onclick=async ()=>{
+        try{
+          const mc = mergedContentAgenda(res.obj);
+          await navigator.clipboard.writeText(JSON.stringify(mc,null,2));
+          $("#btnCopyMergedAgenda").textContent='Kopiert'; setTimeout(()=>{$("#btnCopyMergedAgenda").textContent='Ganze content.json kopieren';},1200);
+        }catch(e){ alert('Kopieren nicht erlaubt – bitte Download nutzen.'); }
+      };
+    });
+
+    $("#btnResetEvent").addEventListener("click", ()=>{
+      ['evTitle','evPlace','evPurpose','evCtaLabel','evCtaHref'].forEach(id=>$("#"+id).value="");
+      $("#evDate").value=""; $("#evTime").value="18:30"; $("#evDateHuman").textContent="";
+      $("#evOut").textContent="{}"; $("#evPreview").innerHTML='<p class="help">Noch kein Termin erzeugt.</p>';
+      $("#evMsg").textContent="";
+      ["btnDownloadAgenda","btnCopyMergedAgenda"].forEach(id=>$("#"+id).disabled=true);
+    });
+
+    // Start
+    loadLive();
   </script>
 </body>
 </html>
