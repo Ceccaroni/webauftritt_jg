@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Erfassen – Geordnete Wildheit</title>
+  <meta name="robots" content="noindex, nofollow">
+  <style>
+    :root{--brand:#84B414;--ink:#1a1a1a;--muted:#5d5d5d;--border:#dde3d6;--paper:#fff;--bg:#f6f8f5;--radius:12px;--shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.08);--maxw:980px}
+    *{box-sizing:border-box}
+    body{margin:0;font:400 17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    header{background:#fff;border-bottom:1px solid var(--border)}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:1rem}
+    h1{font-size:1.35rem;margin:.25rem 0}
+    h2{font-size:1.1rem;margin:1.25rem 0 .5rem 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media (max-width:880px){ .grid{grid-template-columns:1fr} }
+    .card{background:var(--paper);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:1rem}
+    label{display:block;font-weight:600;margin:.5rem 0 .25rem 0}
+    input[type="text"], input[type="date"], textarea, select{width:100%;padding:.6rem .7rem;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:1rem}
+    textarea{min-height:110px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+    .help{color:var(--muted);font-size:.92rem}
+    .actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+    button{appearance:none;border:1px solid #cfd7c5;background:#fff;border-radius:999px;padding:.6rem .95rem;cursor:pointer;font-weight:650;box-shadow:var(--shadow)}
+    button.primary{background:var(--brand);color:#fff;border-color:transparent}
+    pre{white-space:pre-wrap;word-break:break-word;background:#fbfcfa;border:1px solid var(--border);border-radius:10px;padding:.75rem;font-size:.95rem}
+    .preview{display:grid;gap:.4rem}
+    .labels{display:flex;gap:.5rem;flex-wrap:wrap}
+    .label{font-size:.78rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--border);background:#fff;color:#333}
+    .label.bereich{background:#f1f7ea}
+    .label.region{background:#f4f6f8}
+    .label.date{background:#fff;color:#666}
+    .ok{color:#246b00}
+    .err{color:#9d0015}
+    .hr{height:1px;background:var(--border);margin:.75rem 0}
+    /* Passphrase-Overlay */
+    .gate{position:fixed;inset:0;background:rgba(246,248,245,.96);display:flex;align-items:center;justify-content:center;z-index:1000}
+    .gate .panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1rem;max-width:420px;width:92%}
+    .gate h2{margin:.25rem 0 .5rem 0}
+  </style>
+</head>
+<body>
+  <div id="gate" class="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+    <div class="panel">
+      <h2 id="gateTitle">Zutritt</h2>
+      <p class="help">Bitte die Passphrase eingeben.</p>
+      <label for="pw">Passphrase</label>
+      <input id="pw" type="password" autocomplete="current-password" inputmode="text" />
+      <div class="actions">
+        <button class="primary" id="gateOpen">Öffnen</button>
+      </div>
+      <p id="gateMsg" class="help"></p>
+    </div>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <h1>Erfassungsmaske für neue Karte</h1>
+      <p class="help">Nur für interne Nutzung. Ergebnis als Datei herunterladen und im Repo hochladen.</p>
+    </div>
+  </header>
+
+  <main class="wrap" aria-live="polite">
+    <div class="grid">
+      <section class="card" aria-label="Eingabe">
+        <h2>Eingabe</h2>
+
+        <label for="title">Titel *</label>
+        <input id="title" type="text" placeholder="z. B. Velorouten in Brugg sicher machen" required>
+
+        <div class="row">
+          <div>
+            <label for="theme">Bereich *</label>
+            <select id="theme" required></select>
+          </div>
+          <div>
+            <label for="region">Region/Ort *</label>
+            <input id="region" type="text" placeholder="z. B. Brugg, Kanton Bern" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="date">Datum (Veröffentlichung) *</label>
+            <input id="date" type="date" required>
+            <div id="dateHuman" class="help"></div>
+          </div>
+          <div>
+            <label for="image">Bild-Datei (Pfad) </label>
+            <input id="image" type="text" placeholder="assets/images/dateiname.jpg">
+            <div class="help">Pfad im Repo, z. B. <code>assets/images/...</code></div>
+          </div>
+        </div>
+
+        <label for="alt">Bild-Alttext</label>
+        <input id="alt" type="text" placeholder="Was ist auf dem Bild zu sehen?">
+
+        <label for="text">Kurztext *</label>
+        <textarea id="text" placeholder="2–3 Sätze, klar und konkret." required></textarea>
+
+        <label for="next">Nächster Schritt *</label>
+        <textarea id="next" placeholder="Was passiert als Nächstes?" required></textarea>
+
+        <div class="actions">
+          <button class="primary" id="btnPreview">Eintrag erzeugen</button>
+          <button id="btnDownloadCard" disabled>Nur Eintrag als JSON</button>
+          <button id="btnDownloadContent" disabled>content.json aktualisiert</button>
+          <button id="btnReset" type="button">Zurücksetzen</button>
+        </div>
+
+        <p id="msg" class="help"></p>
+        <div class="hr"></div>
+        <p class="help">Datum erscheint auf der Website als „Montag, 22. September 2025“.</p>
+      </section>
+
+      <section class="card" aria-label="Vorschau und Ergebnis">
+        <h2>Vorschau</h2>
+        <div id="preview" class="preview">
+          <p class="help">Noch kein Eintrag erzeugt.</p>
+        </div>
+
+        <h2>JSON-Ergebnis</h2>
+        <pre id="out">{}</pre>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:1rem">
+      <h2>Hochladen</h2>
+      <ol>
+        <li>„Eintrag erzeugen“ klicken.</li>
+        <li>Einen der beiden Downloads wählen:
+          <ul>
+            <li><strong>Nur Eintrag als JSON</strong> → Datei in <code>assets/cards/</code> ablegen (optional Archiv).</li>
+            <li><strong>content.json aktualisiert</strong> → die heruntergeladene <code>content.json</code> an <code>assets/content.json</code> im Repo ersetzen.</li>
+          </ul>
+        </li>
+        <li>Falls ein Bildpfad gesetzt ist: Bilddatei im Repo unter <code>assets/images/</code> hochladen.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    // --- leichte "Tür" ---
+    const PASSPHRASE = "brugg"; // bei Bedarf ändern
+    const gate = document.getElementById('gate');
+    const gateMsg = document.getElementById('gateMsg');
+    document.getElementById('gateOpen').addEventListener('click', ()=>{
+      const v = (document.getElementById('pw').value||"").trim();
+      if(v===PASSPHRASE){ sessionStorage.setItem('erfassen-ok','1'); gate.remove(); }
+      else { gateMsg.textContent = "Passphrase falsch."; }
+    });
+    if(sessionStorage.getItem('erfassen-ok')==='1'){ gate.remove(); }
+
+    // --- helpers ---
+    const $ = s => document.querySelector(s);
+    const pad = n => n.toString().padStart(2,'0');
+    function formatCHDateLong(dateStr){
+      if(!dateStr) return "";
+      const [Y,M,D] = dateStr.split("-").map(Number);
+      const d = new Date(Y, (M||1)-1, D||1);
+      const fmt = new Intl.DateTimeFormat('de-CH', { weekday:'long', day:'2-digit', month:'long', year:'numeric' });
+      const s = fmt.format(d);
+      return s.charAt(0).toUpperCase()+s.slice(1);
+    }
+    function slugify(s){
+      return (s||"").toLowerCase()
+        .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/é|è/g,"e")
+        .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80);
+    }
+    function looksLikeImagePath(p){
+      return /^assets\/images\/.+\.(png|jpe?g|webp|avif|gif)$/i.test(p||"");
+    }
+    function download(filename, text){
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
+      a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    }
+
+    // --- content.json laden, um Bereiche zu befüllen und später zu aktualisieren ---
+    let CONTENT = null;
+    async function loadContent(){
+      try{
+        const res = await fetch('../assets/content.json', {cache:'no-store'});
+        CONTENT = await res.json();
+      }catch(e){
+        CONTENT = { themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"], status:["Entwurf","In Arbeit","beschlossen"], agenda:[], transparency:[], cards:[] };
+      }
+      const sel=$("#theme"); sel.innerHTML='<option value="">– bitte wählen –</option>';
+      CONTENT.themes.forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
+    }
+    loadContent();
+
+    // --- UI Logik ---
+    $("#date").addEventListener("input", e=>{
+      const v = e.target.value;
+      $("#dateHuman").textContent = v ? "→ "+formatCHDateLong(v) : "";
+    });
+
+    function buildObject(){
+      const title = $("#title").value.trim();
+      const theme = $("#theme").value.trim();
+      const region = $("#region").value.trim();
+      const date = $("#date").value;
+      const media = $("#image").value.trim();
+      const alt   = $("#alt").value.trim();
+      const text  = $("#text").value.trim();
+      const next  = $("#next").value.trim();
+
+      const errors = [];
+      if(!title) errors.push("Titel fehlt");
+      if(!theme) errors.push("Bereich fehlt");
+      if(!region) errors.push("Region fehlt");
+      if(!date) errors.push("Datum fehlt");
+      if(!text) errors.push("Kurztext fehlt");
+      if(!next) errors.push("Nächster Schritt fehlt");
+      if(media && !looksLikeImagePath(media)) errors.push("Bildpfad: bitte unter assets/images/... und mit Endung .jpg/.png/.webp");
+
+      const id = "c-" + slugify(title) + "-" + date.replaceAll("-","");
+      const obj = { id, title, theme, region, date, text, next };
+      if(media) obj.media = media;
+      if(alt) obj.alt = alt;
+      return { ok: errors.length===0, errors, obj };
+    }
+
+    function renderPreview(c){
+      const prev = $("#preview");
+      prev.innerHTML = "";
+      const labels = document.createElement("div");
+      labels.className = "labels";
+      const L = (t,cls="") => { const s=document.createElement("span"); s.className="label "+cls; s.textContent=t; return s; };
+      labels.append(L(c.theme,"bereich"));
+      labels.append(L(c.region,"region"));
+      labels.append(L(formatCHDateLong(c.date),"date"));
+      const h3 = document.createElement("h3"); h3.textContent = c.title;
+      const p1 = document.createElement("p"); p1.textContent = c.text;
+      const p2 = document.createElement("p"); p2.innerHTML = "<strong>Nächster Schritt:</strong> "+ (c.next||"–");
+      prev.append(h3, labels, p1, p2);
+    }
+
+    $("#btnPreview").addEventListener("click", ()=>{
+      const res = buildObject();
+      const msg = $("#msg");
+      if(!res.ok){
+        msg.textContent = "Bitte korrigieren: "+ res.errors.join(", ") + ".";
+        msg.className = "err";
+        return;
+      }
+      msg.textContent = "Alles plausibel.";
+      msg.className = "ok";
+      $("#out").textContent = JSON.stringify(res.obj, null, 2);
+      renderPreview(res.obj);
+      $("#btnDownloadCard").disabled = false;
+      $("#btnDownloadContent").disabled = false;
+
+      // Download Single
+      $("#btnDownloadCard").onclick = ()=>{
+        const name = `card-${res.obj.date}-${slugify(res.obj.title)}.json`;
+        download(name, JSON.stringify(res.obj, null, 2));
+      };
+
+      // Download content.json (bestehenden Bestand + neuer Eintrag oben)
+      $("#btnDownloadContent").onclick = ()=>{
+        const content = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
+        content.cards = [res.obj, ...(content.cards||[])];
+        download("content.json", JSON.stringify(content, null, 2));
+      };
+    });
+
+    $("#btnReset").addEventListener("click", ()=>{
+      document.querySelectorAll('input, textarea, select').forEach(el=>{ if(el.type!=='date') el.value=""; });
+      $("#date").value=""; $("#dateHuman").textContent=""; $("#out").textContent="{}"; $("#preview").innerHTML='<p class="help">Noch kein Eintrag erzeugt.</p>';
+      $("#msg").textContent=""; $("#btnDownloadCard").disabled=true; $("#btnDownloadContent").disabled=true;
+    });
+  </script>
+</body>
+</html>
