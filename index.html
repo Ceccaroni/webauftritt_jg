@@ -22,10 +22,28 @@
     .brand{display:flex;align-items:center;gap:.75rem}
     .brand .mark{width:40px;height:40px;border-radius:10px;background:var(--brand);box-shadow:inset 0 0 0 2px #fff,0 1px 2px rgba(0,0,0,.08)}
     .brand h1{margin:0;font-size:1.1rem;font-weight:700;letter-spacing:.2px}
+
+    /* Desktop-CTA */
     .cta{display:flex;gap:.5rem}
     .btn{appearance:none;border:1px solid transparent;border-radius:999px;padding:.6rem .95rem;font-weight:650;cursor:pointer;box-shadow:var(--shadow)}
     .btn.primary{background:var(--brand-dark);color:var(--brand-ink)} .btn.primary:hover{filter:brightness(.98)}
     .btn.secondary{background:#fff;color:#000;border:1px solid var(--border)}
+
+    /* Burger (mobil) */
+    .burger{display:none;appearance:none;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.55rem .7rem;line-height:1;cursor:pointer}
+    .burger:focus-visible{box-shadow:0 0 0 3px rgba(11,95,255,.25)}
+    .burger svg{display:block}
+    .mobile-nav{
+      position:fixed; inset:0 0 auto 0; top:var(--header-h);
+      background:#fff; border-top:1px solid var(--border);
+      box-shadow:0 12px 24px rgba(0,0,0,.08);
+      display:none;
+    }
+    .mobile-nav.is-open{display:block}
+    .mobile-nav .menu{display:grid; gap:.5rem; padding:1rem}
+    .mobile-nav .menu .row{display:flex; gap:.5rem; flex-wrap:wrap}
+    .mobile-nav .menu a{display:inline-block}
+    .mobile-nav .divider{height:1px;background:var(--border);margin:.25rem 0}
 
     /* Hero */
     .hero{background:transparent;border-bottom:none}
@@ -108,7 +126,13 @@
 
     .party-badge{position:absolute;right:0;top:12px;z-index:60;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:.35rem;display:flex;align-items:center}
     .party-badge img{height:28px;width:auto;display:block}
-    @media(max-width:720px){.party-badge{position:static;margin:.5rem 0 0 0} header .brandbar{grid-template-columns:auto auto}}
+    @media(max-width:900px){
+      .party-badge{position:static;margin:.5rem 0 0 0}
+      header .brandbar{grid-template-columns:auto auto}
+      /* Desktop-CTA ausblenden, Burger einblenden */
+      .cta{display:none}
+      .burger{display:inline-flex;align-items:center;justify-content:center}
+    }
     .brandbar.badge-collide{padding-right:112px}
     @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
 
@@ -135,17 +159,41 @@
         <div class="mark" aria-hidden="true"></div>
         <h1>Geordnete Wildheit</h1>
       </div>
+
+      <!-- Desktop-CTA -->
       <nav class="cta" aria-label="Hauptaktionen">
         <button class="btn secondary" id="aboutBtn" aria-controls="ueber-mich" aria-expanded="false">Über mich</button>
         <button class="btn primary" id="mitmachenBtn" aria-label="Mitmachen">Mitmachen</button>
         <button class="btn secondary" id="newsletterBtn" aria-label="Newsletter">Newsletter</button>
       </nav>
 
+      <!-- Burger (nur mobil sichtbar) -->
+      <button class="burger" id="burgerBtn" aria-label="Menü öffnen" aria-controls="mobileMenu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+        </svg>
+      </button>
+
       <div class="party-badge" aria-hidden="true">
         <img src="https://grueneaargau.ch/wp-content/uploads/sites/2/2020/06/Gruene_AG_Logo_RGB-e1591108033630-2560x0-c-default.png" alt="" loading="lazy"
              onerror="this.onerror=null;this.src='assets/logos/logo-gruene-placeholder.svg';">
       </div>
     </div>
+
+    <!-- Mobile-Menü-Panel -->
+    <nav id="mobileMenu" class="mobile-nav" aria-label="Mobilmenü">
+      <div class="menu wrap">
+        <div class="row">
+          <button class="btn secondary" id="mAboutBtn" aria-controls="ueber-mich">Über mich</button>
+          <button class="btn primary" id="mMitmachenBtn">Mitmachen</button>
+          <button class="btn secondary" id="mNewsletterBtn">Newsletter</button>
+        </div>
+        <div class="divider" role="presentation"></div>
+        <div class="row">
+          <a class="btn secondary" href="./impressum/">Impressum &amp; Datenschutz</a>
+        </div>
+      </div>
+    </nav>
   </header>
 
   <main id="main" class="wrap" role="main">
@@ -348,24 +396,21 @@
       });
     }
 
-    // Karten
+    // Karten / TTL/Archivierung
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
-
-    // TTL/Archivierung
-    function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
     function daysBetween(a,b){const MS=24*60*60*1000;return Math.floor((a-b)/MS);}
     function partitionCards(rawCards){
       const now = new Date();
       const byId = new Map(rawCards.map(c => [c.id, c]));
       const archivedIds = new Set();
 
-      // 1) Supersedes: neuere ersetzt ältere sofort
+      // Supersedes
       rawCards.forEach(c=>{
         const arr = Array.isArray(c.supersedes)? c.supersedes : [];
         arr.forEach(id => { if(byId.has(id)) archivedIds.add(id); });
       });
 
-      // 2) Gleiches theme+region → nur neueste bleibt
+      // Gleiches theme+region → nur neueste bleibt
       const groups = new Map();
       rawCards.forEach(c=>{
         const key = `${norm(c.theme)}|${norm(c.region||"")}`;
@@ -377,7 +422,7 @@
         list.slice(1).forEach(old => archivedIds.add(old.id));
       });
 
-      // 3) TTL-Regeln
+      // TTL
       rawCards.forEach(c=>{
         if(archivedIds.has(c.id)) return;
         const d = parseLocalDate(c.date);
@@ -388,7 +433,7 @@
         if(age>ttl) archivedIds.add(c.id);
       });
 
-      // 4) Kapazitätsbremse Front: max. 8 (neueste zuerst)
+      // Kapazitätsbremse (8)
       let front = rawCards.filter(c => !archivedIds.has(c.id));
       front.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
       const limited = front.slice(0,8);
@@ -556,6 +601,43 @@
       const v = document.getElementById('gapInput')?.value?.trim();
       if(v){ alert("Danke! Gemeldete Lücke: "+v); (document.getElementById('gapInput').value=""); }
     });
+
+    // About / Suche
+    const aboutBtn = $("#aboutBtn");
+    const aboutSection = $("#ueber-mich");
+    function setAbout(v){aboutSection.classList.toggle("is-visible", v);aboutBtn?.setAttribute("aria-expanded", String(v)); if(v){history.replaceState(null,"","#ueber-mich");aboutSection.scrollIntoView({behavior:"smooth", block:"start"});}else{history.replaceState(null,"", location.pathname + location.search);aboutBtn?.focus();}}
+    function toggleAbout(){ setAbout(!aboutSection.classList.contains("is-visible")); }
+    function maybeOpenFromHash(){ setAbout(location.hash === "#ueber-mich"); }
+    aboutBtn?.addEventListener("click", toggleAbout);
+    window.addEventListener("hashchange", maybeOpenFromHash);
+    $("#search").addEventListener("input", e => { STATE.q = e.target.value || ""; render(); });
+    $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
+    $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
+
+    // Burger-Menü Logik (mobil)
+    const burgerBtn = $("#burgerBtn");
+    const mobileMenu = $("#mobileMenu");
+    function setMenu(open){
+      mobileMenu.classList.toggle("is-open", open);
+      burgerBtn.setAttribute("aria-expanded", String(open));
+      burgerBtn.setAttribute("aria-label", open ? "Menü schliessen" : "Menü öffnen");
+    }
+    burgerBtn?.addEventListener("click", ()=>{
+      const open = mobileMenu.classList.contains("is-open");
+      setMenu(!open);
+    });
+    document.addEventListener("click",(e)=>{
+      if(!mobileMenu.classList.contains("is-open")) return;
+      const within = mobileMenu.contains(e.target) || burgerBtn.contains(e.target);
+      if(!within) setMenu(false);
+    });
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape" && mobileMenu.classList.contains("is-open")) setMenu(false);
+    });
+    // Mobile-Aktionen (spiegeln Desktop)
+    $("#mAboutBtn")?.addEventListener("click", ()=>{ setMenu(false); setAbout(true); });
+    $("#mMitmachenBtn")?.addEventListener("click", ()=>{ setMenu(false); alert("Mitmachen: kurzes Formular (Demo)."); });
+    $("#mNewsletterBtn")?.addEventListener("click", ()=>{ setMenu(false); alert("Newsletter: DSG-konformer Versand (Demo)."); });
   </script>
 </body>
 </html>
