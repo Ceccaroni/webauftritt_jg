@@ -35,15 +35,9 @@
     .warn{color:#8a4b00}
     .err{color:#9d0015}
     .hr{height:1px;background:var(--border);margin:.75rem 0}
-    /* Passphrase-Overlay */
     .gate{position:fixed;inset:0;background:rgba(246,248,245,.96);display:flex;align-items:center;justify-content:center;z-index:1000}
     .gate .panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1rem;max-width:420px;width:92%}
-    .gate h2{margin:.25rem 0 .5rem 0}
-    /* Dropzone */
-    .drop{border:1px dashed var(--border);border-radius:10px;padding:.6rem .75rem;background:#fbfcfa}
-    .drop.drag{background:#f3f8ef;border-color:#bcd4a6}
     .status{padding:.4rem .6rem;border-radius:8px;border:1px solid var(--border);display:inline-block;margin-top:.5rem}
-    /* Copy-Button beim JSON */
     .json-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
     .iconbtn{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--border);background:#fff;border-radius:10px;padding:.35rem .55rem;cursor:pointer}
     .iconbtn svg{width:18px;height:18px;flex:0 0 18px}
@@ -66,7 +60,7 @@
   <header>
     <div class="wrap">
       <h1>Erfassungsmaske für neue Karte</h1>
-      <p class="help">Die Seite lädt die aktuelle <code>assets/content.json</code>, ergänzt deinen Eintrag und bietet die fertige Datei zum Download an.</p>
+      <p class="help">Die Seite lädt die aktuelle <code>assets/content.json</code>, ergänzt deinen Eintrag und bietet die fertige Datei zum Download oder Kopieren an.</p>
       <div id="loadStatus" class="status">Lade content.json …</div>
     </div>
   </header>
@@ -112,10 +106,18 @@
         <label for="next">Nächster Schritt *</label>
         <textarea id="next" placeholder="Was passiert als Nächstes?" required></textarea>
 
+        <div class="row" style="align-items:center">
+          <div>
+            <label><input id="featured" type="checkbox"> Als Top-Beitrag (featured) anzeigen</label>
+            <div class="help">Wird oben neben dem Porträt als „Featured“ gezeigt.</div>
+          </div>
+        </div>
+
         <div class="actions">
           <button class="primary" id="btnPreview">Eintrag erzeugen</button>
           <button id="btnDownloadCard" disabled>Nur Eintrag als JSON</button>
           <button id="btnDownloadContent" disabled>content.json aktualisiert</button>
+          <button id="btnCopyMerged" disabled>Kopieren: ganze content.json</button>
           <button id="btnReset" type="button">Zurücksetzen</button>
         </div>
 
@@ -123,9 +125,9 @@
         <div class="hr"></div>
 
         <h2>Optional: content.json lokal einlesen</h2>
-        <div id="drop" class="drop" aria-label="Datei ablegen Bereich">
+        <div>
           <input id="file" type="file" accept="application/json" />
-          <p class="help">Falls der Live-Abruf blockiert ist, kannst du hier eine lokale <code>content.json</code> wählen/ablegen. Sie wird als Basis verwendet.</p>
+          <p class="help">Falls der Live-Abruf blockiert ist, kannst du hier eine lokale <code>content.json</code> wählen. Sie wird als Basis verwendet.</p>
         </div>
       </section>
 
@@ -136,8 +138,8 @@
         </div>
 
         <div class="json-head">
-          <h2 style="margin:0">JSON-Ergebnis</h2>
-          <button id="btnCopy" class="iconbtn" aria-label="JSON in die Zwischenablage kopieren" title="JSON kopieren" disabled>
+          <h2 style="margin:0">JSON-Eintrag</h2>
+          <button id="btnCopy" class="iconbtn" aria-label="JSON-Eintrag kopieren" title="JSON kopieren" disabled>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>
             Kopieren
           </button>
@@ -150,8 +152,9 @@
       <h2>Ablauf</h2>
       <ol>
         <li>„Eintrag erzeugen“ klicken.</li>
-        <li><strong>content.json aktualisiert</strong> downloaden und im Repo unter <code>assets/content.json</code> ersetzen.</li>
-        <li>Falls ein Bildpfad gesetzt ist: Bilddatei im Repo unter <code>assets/images/</code> hochladen.</li>
+        <li><strong>content.json aktualisiert</strong> downloaden oder „Kopieren: ganze content.json“ nutzen.</li>
+        <li>Datei im Repo unter <code>assets/content.json</code> ersetzen.</li>
+        <li>Falls ein Bildpfad gesetzt ist: Bild nach <code>assets/images/</code> hochladen.</li>
         <li>Seite hart neu laden: Cmd-Shift-R.</li>
       </ol>
       <p class="help">Alte Einträge bleiben erhalten. Der neue Eintrag wird oben ergänzt. Dubletten (gleiche <code>id</code> oder gleicher Titel+Datum) werden verhindert.</p>
@@ -173,7 +176,6 @@
     // Helfer
     const $ = s => document.querySelector(s);
     const statusEl = document.getElementById('loadStatus');
-
     function setStatus(text, cls){ statusEl.textContent=text; statusEl.className='status '+(cls||''); }
     function slugify(s){ return (s||"").toLowerCase()
       .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/é|è/g,"e")
@@ -206,14 +208,14 @@
         CONTENT=await fetchLiveContent();
         setStatus('content.json geladen ✓','ok');
       }catch(e){
-        setStatus('Konnte content.json nicht live laden. Du kannst unten eine lokale Datei wählen.','warn');
+        setStatus('content.json konnte nicht live geladen werden. Du kannst unten eine lokale Datei wählen.','warn');
         CONTENT={themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"],status:["Entwurf","In Arbeit","beschlossen"],agenda:[],transparency:[],cards:[]};
       }
       const sel=$("#theme"); sel.innerHTML='<option value="">– bitte wählen –</option>';
       (CONTENT.themes||[]).forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
     })();
 
-    // Optional lokale Datei
+    // Lokale Datei
     $("#file").addEventListener('change', async (e)=>{
       const f=e.target.files?.[0]; if(!f) return;
       try{
@@ -246,6 +248,7 @@
       const alt=$("#alt").value.trim();
       const text=$("#text").value.trim();
       const next=$("#next").value.trim();
+      const featured = $("#featured").checked;
 
       const errors=[];
       if(!title) errors.push("Titel fehlt");
@@ -260,6 +263,7 @@
       const obj={id,title,theme,region,date,text,next};
       if(media) obj.media=media;
       if(alt) obj.alt=alt;
+      if(featured) obj.featured=true;
       return {ok:errors.length===0, errors, obj};
     }
 
@@ -274,18 +278,20 @@
       const h3=document.createElement("h3"); h3.textContent=c.title;
       const p1=document.createElement("p"); p1.textContent=c.text;
       const p2=document.createElement("p"); p2.innerHTML="<strong>Nächster Schritt:</strong> "+(c.next||"–");
+      if(c.featured) prev.append(document.createTextNode("Top-Beitrag (featured)"));
       prev.append(h3,labels,p1,p2);
     }
 
-    function mergeAndDownload(newObj){
+    function mergedContent(newObj){
       const base = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
       base.cards = base.cards || [];
-      // Dubletten vermeiden (id oder Kombi Title+Date)
+      // Dubletten vermeiden
       base.cards = base.cards.filter(c => !(c.id===newObj.id || (c.title===newObj.title && c.date===newObj.date)));
       base.cards.unshift(newObj);
-      download("content.json", JSON.stringify(base, null, 2));
+      return base;
     }
 
+    // Aktionen
     $("#btnPreview").addEventListener("click", ()=>{
       const res=buildObject();
       const msg=$("#msg");
@@ -298,26 +304,37 @@
 
       $("#btnDownloadCard").disabled=false;
       $("#btnDownloadContent").disabled=false;
+      $("#btnCopyMerged").disabled=false;
 
       $("#btnDownloadCard").onclick=()=>{
         const name=`card-${res.obj.date}-${slugify(res.obj.title)}.json`;
         download(name, JSON.stringify(res.obj,null,2));
       };
-      $("#btnDownloadContent").onclick=()=>mergeAndDownload(res.obj);
+      $("#btnDownloadContent").onclick=()=>{
+        const mc = mergedContent(res.obj);
+        download("content.json", JSON.stringify(mc,null,2));
+      };
       $("#btnCopy").onclick=async ()=>{
         try{
           await navigator.clipboard.writeText(JSON.stringify(res.obj,null,2));
-          $("#btnCopy").innerHTML='<svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg> Kopiert';
-          setTimeout(()=>{$("#btnCopy").innerHTML='<svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg> Kopieren';},1200);
+          $("#btnCopy").textContent='Kopiert'; setTimeout(()=>{$("#btnCopy").textContent='Kopieren';},1200);
         }catch(e){ alert('Kopieren nicht erlaubt – bitte manuell markieren.'); }
+      };
+      $("#btnCopyMerged").onclick=async ()=>{
+        try{
+          const mc = mergedContent(res.obj);
+          await navigator.clipboard.writeText(JSON.stringify(mc,null,2));
+          $("#btnCopyMerged").textContent='Kopiert'; setTimeout(()=>{$("#btnCopyMerged").textContent='Kopieren: ganze content.json';},1200);
+        }catch(e){ alert('Kopieren nicht erlaubt – bitte Download nutzen.'); }
       };
     });
 
     $("#btnReset").addEventListener("click", ()=>{
       document.querySelectorAll('input, textarea, select').forEach(el=>{ if(el.type!=='date') el.value=""; });
+      $("#featured").checked=false;
       $("#date").value=""; $("#dateHuman").textContent="";
       $("#out").textContent="{}"; $("#preview").innerHTML='<p class="help">Noch kein Eintrag erzeugt.</p>';
-      $("#msg").textContent=""; $("#btnDownloadCard").disabled=true; $("#btnDownloadContent").disabled=true; $("#btnCopy").disabled=true;
+      $("#msg").textContent=""; $("#btnDownloadCard").disabled=true; $("#btnDownloadContent").disabled=true; $("#btnCopy").disabled=true; $("#btnCopyMerged").disabled=true;
     });
   </script>
 </body>
