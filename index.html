@@ -153,24 +153,24 @@
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
 
-          <!-- Featured -->
-          <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
+        <!-- Featured -->
+        <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
 
-          <!-- LIVE-BOX -->
-          <div class="tile" aria-label="Aktuelles Update">
-            <h3>Diese Woche erledigt</h3>
-            <div id="liveList" class="live-list" aria-live="polite"></div>
-            <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
-              <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
-              <button class="btn secondary" type="submit">Senden</button>
-            </form>
-          </div>
+        <!-- LIVE-BOX -->
+        <div class="tile" aria-label="Aktuelles Update">
+          <h3>Diese Woche erledigt</h3>
+          <div id="liveList" class="live-list" aria-live="polite"></div>
+          <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
+            <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
+            <button class="btn secondary" type="submit">Senden</button>
+          </form>
+        </div>
 
-          <!-- Nächste Termine -->
-          <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
-            <h3>Nächste Termine in Brugg</h3>
-            <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
-          </div>
+        <!-- Nächste Termine -->
+        <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
+          <h3>Nächste Termine in Brugg</h3>
+          <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
+        </div>
         </div>
 
         <div class="tile hero-portrait" aria-label="Porträt">
@@ -240,6 +240,8 @@
     });
 
     const $ = s => document.querySelector(s);
+
+    // Hilfsfunktionen
     function el(tag, attrs={}, children=[]){
       const n=document.createElement(tag);
       for(const [k,v] of Object.entries(attrs)){
@@ -251,6 +253,8 @@
       (Array.isArray(children)?children:[children]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
       return n;
     }
+    const norm = s => (s??"").toString().normalize('NFKC').trim().toLowerCase();
+
     function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
     function formatCHDateLong(dateStr){
       const d=parseLocalDate(dateStr);
@@ -261,20 +265,21 @@
 
     const STATE = { data:null, q:"", themes:new Set(), status:new Set(), themeOrder:[] };
 
-    // Chips
+    // Chips (verwenden normalisierte Schlüssel in STATE)
     function chip(label, group){
       if(!label || (typeof label==="string" && label.trim()==="")) return document.createComment("skip-empty-chip");
-      const active = STATE[group]?.has && STATE[group].has(label);
+      const key = norm(label);
+      const active = STATE[group]?.has && STATE[group].has(key);
       const c=el("button",{class:"chip","aria-pressed":active?"true":"false"},label);
       c.addEventListener("click",()=>{
         const pressed=c.getAttribute("aria-pressed")==="true";
         const set=STATE[group];
         if(pressed){
-          set.delete(label); c.setAttribute("aria-pressed","false");
-          if(group==="themes"){ STATE.themeOrder = STATE.themeOrder.filter(t => t!==label); }
+          set.delete(key); c.setAttribute("aria-pressed","false");
+          if(group==="themes"){ STATE.themeOrder = STATE.themeOrder.filter(t => norm(t)!==key); }
         }else{
-          set.add(label); c.setAttribute("aria-pressed","true");
-          if(group==="themes"){ STATE.themeOrder = [label, ...STATE.themeOrder.filter(t => t!==label)]; }
+          set.add(key); c.setAttribute("aria-pressed","true");
+          if(group==="themes"){ STATE.themeOrder = [label, ...STATE.themeOrder.filter(t => norm(t)!==key)]; }
         }
         render();
       });
@@ -331,23 +336,23 @@
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
 
-      // Aktive Themen-Menge ohne leere Labels
-      const selectedThemes = Array.from(STATE.themes).filter(t => t && String(t).trim()!=="");
+      // Themen: Vereinigung über normalisierte Keys
+      const hasThemeSelection = STATE.themes.size > 0;
+      const cardThemeKey = norm(c.theme);
+      const tOK = hasThemeSelection ? STATE.themes.has(cardThemeKey) : false;
 
-      // Nur Karten der aktiven Themen anzeigen (ODER-Logik über die Auswahl)
-      const tOK = selectedThemes.length>0 ? selectedThemes.includes(c.theme) : false;
+      // Status: nur anwenden, wenn mind. ein Status aktiv ist; Karten ohne Status bleiben sichtbar
+      const hasStatusSelection = STATE.status.size > 0;
+      const sOK = hasStatusSelection ? (c.status ? STATE.status.has(norm(c.status)) : true) : true;
 
-      // Status-Filter: nur anwenden, wenn Karte Status hat; Karten ohne Status bleiben sichtbar
-      const sOK = (STATE.status.size===0) || (c.status ? STATE.status.has(c.status) : true);
-
-      // Freitext
+      // Suche
       const qOK = !q || [c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
 
       return tOK && sOK && qOK;
     }
     function sortCards(a,b){
-      const ia = STATE.themeOrder.indexOf(a.theme);
-      const ib = STATE.themeOrder.indexOf(b.theme);
+      const ia = STATE.themeOrder.findIndex(t => norm(t)===norm(a.theme));
+      const ib = STATE.themeOrder.findIndex(t => norm(t)===norm(b.theme));
       if(ia!==ib) return ia-ib;
       return (b.date||"").localeCompare(a.date||"");
     }
@@ -411,7 +416,7 @@
       host.innerHTML=""; host.appendChild(box); host.style.display='';
     }
 
-    // Live-Box (letztes 30 Tage)
+    // Live-Box (letzte 30 Tage)
     function parseDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim()); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
     function withinLastDays(iso,days=30){const d=parseDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
     function renderLive(){
