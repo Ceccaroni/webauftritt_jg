@@ -81,9 +81,6 @@
     .card h3{margin:.1rem 0 .35rem 0;font-size:1.1rem;line-height:1.3}
     .meta{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.25rem 0 .6rem 0}
     .label{font-size:.78rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--border);background:#fff;color:#333}
-    .label.status-entwurf{background:#f6fae9;border-color:#dfecc2}
-    .label.status-inarbeit{background:#eef7ee;border-color:#cfe6cf}
-    .label.status-beschlossen{background:#eef4ff;border-color:#ccdbff}
     .label.them{background:#f1f7ea}
     .label.region{background:#f4f6f8}
     .label.date{background:#fff;color:var(--muted)}
@@ -107,10 +104,7 @@
     .card .media img{width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover}
     .card .media.square img{aspect-ratio:1/1}
 
-    /* Motion-Preference */
-    @media (prefers-reduced-motion: reduce){
-      .card, .chip{transition:none !important}
-    }
+    @media (prefers-reduced-motion: reduce){ .card, .chip{transition:none !important} }
 
     @media print{
       body{background:#fff;color:#000}
@@ -128,7 +122,6 @@
     @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
     .filters{display:grid;grid-template-columns:auto auto 1fr;gap:.75rem;align-items:end;margin-top:.75rem}
 
-    /* Mobile-Layout */
     @media(max-width:720px){
       .hero-grid{grid-template-columns:1fr;gap:.75rem;padding:.8rem 0}
       .hero .tile{padding:.75rem}
@@ -145,8 +138,6 @@
       body{padding-bottom:max(env(safe-area-inset-bottom),0px)}
       .agenda-item{grid-template-columns:1fr}
       .about-grid{grid-template-columns:1fr}
-
-      /* Mobile-Reihenfolge: Foto zuerst, dann Live-Box */
       .hero-portrait{order:-1}
       .live-box{order:1}
     }
@@ -155,7 +146,6 @@
     .agenda-cta a:hover{color:#2f5200}
     .agenda-cta a:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 
-    /* Desktop: Chips nicht umbrechen */
     @media(min-width:721px){
       #themes, #status{flex-wrap:nowrap;overflow-x:hidden;white-space:nowrap}
       #themes .chip, #status .chip{flex:0 0 auto}
@@ -164,12 +154,12 @@
     /* Mobile Top-Button */
     .to-top{
       position:fixed;right:16px;bottom:16px;z-index:80;
-      display:none; /* per JS sichtbar ab 1x Viewporthöhe */
+      display:none;
       border:1px solid var(--border);border-radius:999px;background:#fff;
       padding:.6rem .8rem;box-shadow:var(--shadow);font-weight:650;cursor:pointer
     }
     .to-top:focus-visible{box-shadow:0 0 0 3px rgba(11,95,255,.25)}
-    @media(min-width:721px){ .to-top{display:none !important} } /* nur Mobile */
+    @media(min-width:721px){ .to-top{display:none !important} }
   </style>
 </head>
 <body>
@@ -200,9 +190,9 @@
       <div class="hero-grid wrap">
         <div class="hero-copy">
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
-        <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
+          <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
 
-          <!-- LIVE-BOX: Diese Woche erledigt -->
+          <!-- LIVE-BOX -->
           <div class="live-box tile" aria-label="Aktuelles Update">
             <h3>Diese Woche erledigt</h3>
             <div id="liveList" class="live-list" aria-live="polite"></div>
@@ -220,13 +210,14 @@
 
         <div class="tile hero-portrait" aria-label="Porträt">
           <a href="assets/julia-grieder-portraet.png" target="_blank" rel="noopener" aria-label="Porträt in neuem Tab öffnen">
-            <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
+            <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager"
+                 onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
           </a>
         </div>
       </div>
     </section>
 
-    <!-- Über mich (nur auf Klick sichtbar) -->
+    <!-- Über mich -->
     <section id="ueber-mich" class="about" aria-label="Über mich">
       <div class="about-grid wrap">
         <div class="tile">
@@ -235,12 +226,13 @@
           <p><em>Nächster Schritt:</em> Sprechstunde jeweils Donnerstag 18–19 Uhr (Ort folgt).</p>
         </div>
         <div class="tile">
-          <img class="portrait" src="assets/julia-grieder-quad.jpg" alt="" loading="lazy">
+          <img class="portrait" src="assets/julia-grieder-quad.jpg" alt="" loading="lazy"
+               onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
         </div>
       </div>
     </section>
 
-    <!-- Filterzeile -->
+    <!-- Filter -->
     <section class="filters" aria-label="Filter und Suche">
       <div class="chips" id="themes" role="group" aria-label="Themen"></div>
       <div class="chips" id="status" role="group" aria-label="Status"></div>
@@ -295,26 +287,26 @@
       ],
       transparency: [],
       cards: [
-        { id:"c1", title:"Velorouten in Brugg sicher machen", status:"In Arbeit", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
+        { id:"c1", title:"Velorouten in Brugg sicher machen", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
           media:"assets/julia-grieder-aktion.jpg", alt:"Julia Grieder bei einer Begehung der Veloroute in Brugg",
           text:"Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
           next:"Begehung mit Tiefbau, Prioritätenliste freigeben." },
-        { id:"c2", title:"Schulen entlasten – Zeit für Lernen statt Formulare", status:"beschlossen", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
+        { id:"c2", title:"Schulen entlasten – Zeit für Lernen statt Formulare", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
           text:"Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
           next:"Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln." },
-        { id:"c3", title:"Sichere, durchgängige Velorouten", status:"In Arbeit", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
+        { id:"c3", title:"Sichere, durchgängige Velorouten", theme:"Verkehr", region:"Gemeinde", date:"2025-09-10",
           text:"Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
           next:"Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten." },
-        { id:"c4", title:"Energie fair: Fernwärme mit Sozialtarif", status:"In Arbeit", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
+        { id:"c4", title:"Energie fair: Fernwärme mit Sozialtarif", theme:"Energie", region:"Gemeinde", date:"2025-09-18",
           text:"Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
           next:"Werkleitungsgespräch; Tarife mit Nachbargemeinden vergleichen." },
-        { id:"c5", title:"PV-Pflicht für geeignete Dächer", status:"beschlossen", theme:"Energie", region:"Kanton Bern", date:"2025-08-30",
+        { id:"c5", title:"PV-Pflicht für geeignete Dächer", theme:"Energie", region:"Kanton Bern", date:"2025-08-30",
           text:"Genehmigung vereinfacht, Standard bis 30 kW. Leitfaden für Gemeinden folgt.",
           next:"Leitfaden-Entwurf in KW 39 (öffentliche Konsultation)." },
-        { id:"c6", title:"ÖV verlässlicher machen", status:"Entwurf", theme:"Verkehr", region:"Region Emmental", date:"2025-09-05",
+        { id:"c6", title:"ÖV verlässlicher machen", theme:"Verkehr", region:"Region Emmental", date:"2025-09-05",
           text:"Taktverdichtung zu Schulstart/Feierabend, Busspuren an Engstellen, bessere Anschlüsse an S-Bahn.",
           next:"Kosten-Nutzen-Rechnung; Gespräche mit RBS/SBB ansetzen." },
-        { id:"c7", title:"Digitale Teilhabe an Schulen", status:"Entwurf", theme:"Bildung", region:"Kanton Bern", date:"2025-09-02",
+        { id:"c7", title:"Digitale Teilhabe an Schulen", theme:"Bildung", region:"Kanton Bern", date:"2025-09-02",
           text:"Bibliotheken als Lernhubs, Open-Source-Endgeräteverwaltung, Datensparsamkeit.",
           next:"Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch." }
       ]
@@ -333,7 +325,7 @@
       return n;
     }
 
-    // --- STATE: standardmässig NICHTS aktiv ---
+    // State
     const state = { q:"", themes:new Set(), status:new Set(), themeOrder:[] };
 
     function chip(label, group){
@@ -362,11 +354,20 @@
       const tWrap=$("#themes"); const sWrap=$("#status");
       tWrap.innerHTML=""; sWrap.innerHTML="";
       DATA.themes.forEach(t=>tWrap.appendChild(chip(t,"themes")));
-      DATA.status.forEach(s=>sWrap.appendChild(chip(s,"status")));
+      ["Entwurf","In Arbeit","beschlossen"].forEach(s=>sWrap.appendChild(chip(s,"status"))); // nur Filter, keine Anzeige
     }
 
-    // ICS/Agenda
+    // Datum
     function pad(n){return n.toString().padStart(2,'0')}
+    function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
+    function formatCHDateLong(dateStr){
+      const d=parseLocalDate(dateStr);
+      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      const s=fmt.format(d);
+      return s.charAt(0).toUpperCase()+s.slice(1);
+    }
+
+    // Agenda
     function toUTCStr(d){return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`}
     function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
     function escapeICS(s){return (s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n")}
@@ -381,20 +382,15 @@
         "END:VEVENT","END:VCALENDAR"].join("\r\n");
       return new Blob([ics],{type:"text/calendar;charset=utf-8"});
     }
-    function formatCHDate(dateStr,timeStr){const d=parseLocalDateTime(dateStr,timeStr);const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});const [hh,mm]=(timeStr||'09:00').split(':');return `${fmt.format(d)}, ${hh}.${mm} Uhr`}
-
-    // Langes Datum: „Montag, 22. September 2025“ (erster Buchstabe gross)
-    function formatCHDateLong(dateStr){
-      const [Y,M,D]=(dateStr||"").split("-").map(Number);
-      const d=new Date(Y,(M||1)-1,(D||1),0,0,0);
+    function formatCHDate(dateStr,timeStr){
+      const d=parseLocalDateTime(dateStr,timeStr);
       const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const s=fmt.format(d);
-      return s.charAt(0).toUpperCase()+s.slice(1);
+      const [hh,mm]=(timeStr||'09:00').split(':');
+      const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1)+`, ${hh}.${mm} Uhr`;
     }
-
     function renderAgenda(){
       const host=$("#miniAgenda"); if(!host) return; host.innerHTML="";
-      const items=(DATA.agenda||[]).slice(0,1); // DEV: vorläufig 1 Eintrag
+      const items=(DATA.agenda||[]).slice(0,1);
       if(items.length===0){host.appendChild(el("div",{class:"agenda-item"},[el("div",{class:"agenda-date"},"—"),el("div",{class:"agenda-meta"},"Noch keine Termine publiziert.") ]));return;}
       items.forEach(it=>{
         const human=formatCHDate(it.date,it.time); const dtAttr=`${it.date}T${(it.time||'09:00')}:00`;
@@ -409,13 +405,12 @@
       });
     }
 
-    function statusClass(s){return s==="Entwurf"?"status-entwurf":s==="In Arbeit"?"status-inarbeit":s==="beschlossen"?"status-beschlossen":""}
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
     function matchesFilters(c){
       const q=state.q.trim().toLowerCase();
-      const tOK = state.themes.size===0 ? false : state.themes.has(c.theme); // nichts aktiv => nichts anzeigen
-      const sOK = state.status.size===0 || state.status.has(c.status);
-      const qOK=!q||[c.title,c.text,c.theme,c.region,c.status].join(" ").toLowerCase().includes(q);
+      const tOK = state.themes.size===0 ? false : state.themes.has(c.theme);
+      const sOK = state.status.size===0 || true; // Status nur als Filter gedacht
+      const qOK=!q||[c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
       return tOK && sOK && qOK;
     }
     function sortCards(a,b){
@@ -427,21 +422,24 @@
 
     function card(c){
       const meta=el("div",{class:"meta"},[
-        label(c.theme,"bereich"),           // Bereich = Thema
+        label(c.theme,"bereich"),
         label(c.region||"","region"),
-        label(formatCHDateLong(c.date),"date"), // NEU: langes Datum in den Karten
+        label(formatCHDateLong(c.date),"date"),
       ]);
       const body=el("div",{class:"body"},[
-        el("h3",{},c.title),
-        meta,
+        el("h3",{},c.title), meta,
         el("p",{},c.text),
         el("p",{class:"next"},"Nächster Schritt: "+c.next)
       ]);
 
-      // Medienblock: Bild klickbar (öffnet Original im neuen Tab)
+      // Bild mit Fallback
       let media=null;
       if(c.media){
-        const img = el("img",{src:c.media,alt:c.alt||""});
+        const img = el("img",{
+          src:c.media,
+          alt:c.alt||"",
+          onerror:(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src='assets/image-placeholder-16x9.svg'; }
+        });
         const a = el("a",{href:c.media,target:"_blank",rel:"noopener","aria-label":"Bild in neuem Tab öffnen"},img);
         media = el("div",{class:"media"+(c.square?" square":"")},a);
       }
@@ -455,30 +453,19 @@
       return article;
     }
 
-    // Microtransition (FLIP) für Re-Ordering
+    // Microtransition
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    function getPositions(container){
-      const pos={};
-      container.querySelectorAll('.card').forEach(el=>{
-        const r=el.getBoundingClientRect();
-        pos[el.id]={top:r.top,left:r.left};
-      });
-      return pos;
-    }
-    function animateReorder(container, before, after){
+    function getPositions(container){const pos={};container.querySelectorAll('.card').forEach(el=>{const r=el.getBoundingClientRect();pos[el.id]={top:r.top,left:r.left};});return pos;}
+    function animateReorder(container,before,after){
       if(prefersReduced) return;
       container.querySelectorAll('.card').forEach(el=>{
         const id=el.id;
         if(before[id] && after[id]){
           const dx = before[id].left - after[id].left;
           const dy = before[id].top  - after[id].top;
-          if(dx || dy){
-            el.style.transform = `translate(${dx}px, ${dy}px)`;
-            el.style.transition = 'transform 0s';
-            requestAnimationFrame(()=>{
-              el.style.transition = 'transform .24s ease';
-              el.style.transform = 'translate(0,0)';
-            });
+          if(dx||dy){
+            el.style.transform=`translate(${dx}px, ${dy}px)`; el.style.transition='transform 0s';
+            requestAnimationFrame(()=>{ el.style.transition='transform .24s ease'; el.style.transform='translate(0,0)'; });
           }
         }
       });
@@ -487,7 +474,6 @@
     function render(){
       const host=$("#masonry");
       host.setAttribute("aria-busy","true");
-
       const before = getPositions(host);
       const list = DATA.cards.filter(matchesFilters).sort(sortCards);
 
@@ -499,66 +485,36 @@
         return;
       }
       list.forEach(c => host.appendChild(card(c)));
-
       const after = getPositions(host);
       animateReorder(host, before, after);
-
       host.setAttribute("aria-busy","false");
     }
 
-    // --- LIVE-BOX Logik ---
-    function parseDateFlexible(iso){
-      if(!iso) return null;
-      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
-      if(m){ return new Date(Number(m[1]), Number(m[2])-1, Number(m[3])); }
-      const d = new Date(iso);
-      return isNaN(d.getTime()) ? null : d;
-    }
-    function withinLastDays(iso, days=30){
-      const d = parseDateFlexible(iso);
-      if(!d) return false;
-      const now = new Date();
-      const ms = days*24*60*60*1000;
-      return (now - d) >= 0 && (now - d) <= ms;
-    }
+    // Live-Box
+    function parseDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim()); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
+    function withinLastDays(iso,days=30){const d=parseDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
     function renderLive(){
       const host=$("#liveList"); if(!host) return; host.innerHTML="";
-      const recent=(DATA.cards||[])
-        .filter(c=>withinLastDays(c.date,30))
-        .sort((a,b)=> (b.date||"").localeCompare(a.date||""))
-        .slice(0,1);
-
+      const recent=(DATA.cards||[]).filter(c=>withinLastDays(c.date,30)).sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,1);
       if(recent.length===0){
         host.appendChild(el("div",{class:"live-item"},[
           el("div",{},"Kein Update in diesem Monat."),
           el("div",{class:"stamp"},"Stand: "+ new Intl.DateTimeFormat('de-CH',{dateStyle:'medium'}).format(new Date()))
-        ]));
-        return;
+        ])); return;
       }
       const c=recent[0];
       host.appendChild(el("div",{class:"live-item"},[
         el("strong",{}, c.title),
-        // Bereich = Thema; langes Datum im de-CH Format
         el("div",{class:"stamp"}, `${c.theme} · ${c.region||''} · ${formatCHDateLong(c.date)}`),
         el("div",{}, c.text),
         el("div",{class:"proof"},"Nächster Schritt: " + (c.next||"–"))
       ]));
     }
 
-    // About-Toggle
+    // About
     const aboutBtn = $("#aboutBtn");
     const aboutSection = $("#ueber-mich");
-    function setAbout(visible){
-      aboutSection.classList.toggle("is-visible", visible);
-      aboutBtn.setAttribute("aria-expanded", String(visible));
-      if(visible){
-        history.replaceState(null,"","#ueber-mich");
-        aboutSection.scrollIntoView({behavior:"smooth", block:"start"});
-      }else{
-        history.replaceState(null,"", location.pathname + location.search);
-        aboutBtn.focus();
-      }
-    }
+    function setAbout(v){aboutSection.classList.toggle("is-visible", v);aboutBtn.setAttribute("aria-expanded", String(v)); if(v){history.replaceState(null,"","#ueber-mich");aboutSection.scrollIntoView({behavior:"smooth", block:"start"});}else{history.replaceState(null,"", location.pathname + location.search);aboutBtn.focus();}}
     function toggleAbout(){ setAbout(!aboutSection.classList.contains("is-visible")); }
     function maybeOpenFromHash(){ setAbout(location.hash === "#ueber-mich"); }
     aboutBtn.addEventListener("click", toggleAbout);
@@ -575,42 +531,26 @@
       const links=DATA.transparency||[]; if(links.length===0) return;
       links.forEach(d=>{const t=d.title||d.href||"Link"; ul.appendChild(el("li",{},el("a",{href:d.href||"#"},t)))});}
 
-    // Init & Tick
-    function tick(){
-      renderLive();
-      renderAgenda();
-      renderTransparency();
-      buildFilters();
-      render();
-      maybeOpenFromHash();
-    }
+    // Init
+    function tick(){ renderLive(); renderAgenda(); renderTransparency(); buildFilters(); render(); maybeOpenFromHash(); }
     tick();
 
-    // Live-Box: Dummy-Handler
+    // Form-Handler
     document.getElementById('gapForm')?.addEventListener('submit', e=>{
       e.preventDefault();
       const v = document.getElementById('gapInput')?.value?.trim();
       if(v){ alert("Danke! Gemeldete Lücke: "+v); (document.getElementById('gapInput').value=""); }
     });
 
-    // Mobile Top-Button: sichtbar ab 1x Viewporthöhe
+    // Mobile Top-Button
     (function initTopButton(){
       const btn = document.getElementById('toTop');
       if(!btn) return;
       const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function toggle(){
-        if (window.innerWidth <= 720 && window.scrollY > window.innerHeight){
-          btn.style.display = 'inline-flex';
-        } else {
-          btn.style.display = 'none';
-        }
-      }
+      function toggle(){ if (window.innerWidth <= 720 && window.scrollY > window.innerHeight){ btn.style.display = 'inline-flex'; } else { btn.style.display = 'none'; } }
       window.addEventListener('scroll', toggle, {passive:true});
       window.addEventListener('resize', toggle);
-      btn.addEventListener('click', () => {
-        window.scrollTo({top:0, behavior: prefersReduced ? 'auto' : 'smooth'});
-        btn.blur();
-      });
+      btn.addEventListener('click', () => { window.scrollTo({top:0, behavior: prefersReduced ? 'auto' : 'smooth'}); btn.blur(); });
       toggle();
     })();
   </script>
