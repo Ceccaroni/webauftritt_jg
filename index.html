@@ -253,7 +253,10 @@
         else if(k.startsWith("on")&&typeof v==="function"){ n.addEventListener(k.slice(2),v); }
         else if(v!==null && v!==undefined){ n.setAttribute(k,v); }
       }
-      (Array.isArray(children)?children:[children]).forEach(c=>n.appendChild(typeof c==="string"?document.createTextNode(c):c));
+      (Array.isArray(children)?children:[children]).forEach(c=>{
+        if(c===null || c===undefined || c===false) return; // Fix: null/undefined/false überspringen
+        n.appendChild(typeof c==="string" ? document.createTextNode(c) : c);
+      });
       return n;
     }
     function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
@@ -386,7 +389,6 @@
     function updateFilterInfo(count){
       const info=$("#filterInfo"); if(!info) return;
       const themes = Array.from(STATE.themes).map(k=>{
-        // Anzeige mit Original-Label, falls vorhanden
         const original = (STATE.data?.themes||[]).find(t => norm(t)===k);
         return original || k;
       });
