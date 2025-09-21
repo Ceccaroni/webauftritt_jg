@@ -1,6 +1,17 @@
 {
-  "themes": ["Bildung", "Verkehr", "Energie", "Gleichstellung", "Digitalisierung", "Lokales"],
-  "status": ["Entwurf", "In Arbeit", "beschlossen"],
+  "themes": [
+    "Bildung",
+    "Verkehr",
+    "Energie",
+    "Gleichstellung",
+    "Digitalisierung",
+    "Lokales"
+  ],
+  "status": [
+    "Entwurf",
+    "In Arbeit",
+    "beschlossen"
+  ],
   "agenda": [
     {
       "date": "2025-09-26",
@@ -14,6 +25,18 @@
   ],
   "transparency": [],
   "cards": [
+    {
+      "id": "c-kinder-lernen-durch-beziehung-20250921",
+      "title": "Kinder lernen durch Beziehung",
+      "theme": "Bildung",
+      "region": "Brugg und Aarau",
+      "date": "2025-09-21",
+      "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "next": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "media": "assets/images/ueberraschung.png",
+      "alt": "Überrascht?",
+      "featured": true
+    },
     {
       "id": "c-schule-neu-denken-box-oeffnen-20250921",
       "title": "Schule neu denken - Box öffnen",
@@ -91,28 +114,26 @@
       "next": "Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch."
     },
     {
-  "id": "c-pressefreiheit-eingeschraenkt-20250921",
-  "title": "Pressefreiheit eingeschränkt",
-  "theme": "Gleichstellung",
-  "region": "Weltweit",
-  "date": "2025-09-21",
-  "text": "Donald Trump zeigt deutlich, welche Ziele er verfolgt. Wir als Europäer müssen aufstehen. NICHT NOCH EINMAL #pressefreiheit #schleichend #drittesreich",
-  "next": "Steht auf und benennt die Lügen und den Plan. We're coming after you, Donald.",
-  "media": "assets/images/image (3).png",
-  "alt": "Es wird düster"
-},
+      "id": "c-pressefreiheit-eingeschraenkt-20250921",
+      "title": "Pressefreiheit eingeschränkt",
+      "theme": "Gleichstellung",
+      "region": "Weltweit",
+      "date": "2025-09-21",
+      "text": "Donald Trump zeigt deutlich, welche Ziele er verfolgt. Wir als Europäer müssen aufstehen. NICHT NOCH EINMAL #pressefreiheit #schleichend #drittesreich",
+      "next": "Steht auf und benennt die Lügen und den Plan. We're coming after you, Donald.",
+      "media": "assets/images/image (3).png",
+      "alt": "Es wird düster"
+    },
     {
-  "id": "c-wer-blockiert-lohngleichheit-20250921",
-  "title": "Wer blockiert Lohngleichheit?",
-  "theme": "Gleichstellung",
-  "region": "Brugg, Kafi Schnaps",
-  "date": "2025-09-21",
-  "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-  "next": "Pressemitteilung und aufmachen des \"Grossen Fasses\" National.",
-  "media": "assets/images/labradoodle3.png",
-  "alt": "Nase ins Unangenehme stecken"
-}
+      "id": "c-wer-blockiert-lohngleichheit-20250921",
+      "title": "Wer blockiert Lohngleichheit?",
+      "theme": "Gleichstellung",
+      "region": "Brugg, Kafi Schnaps",
+      "date": "2025-09-21",
+      "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
+      "next": "Pressemitteilung und aufmachen des \"Grossen Fasses\" National.",
+      "media": "assets/images/labradoodle3.png",
+      "alt": "Nase ins Unangenehme stecken"
+    }
   ]
 }
-
-
