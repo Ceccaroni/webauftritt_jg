@@ -84,7 +84,6 @@
     .label.them{background:#f1f7ea}
     .label.region{background:#f4f6f8}
     .label.date{background:#fff;color:var(--muted)}
-    /* Bereich-Pill (ersetzt Status) */
     .label.bereich{background:#f1f7ea;border-color:#e0e4da;color:#333}
 
     .body p{margin:.25rem 0 .55rem 0}
@@ -153,8 +152,7 @@
 
     /* Mobile Top-Button */
     .to-top{
-      position:fixed;right:16px;bottom:16px;z-index:80;
-      display:none;
+      position:fixed;right:16px;bottom:16px;z-index:80;display:none;
       border:1px solid var(--border);border-radius:999px;background:#fff;
       padding:.6rem .8rem;box-shadow:var(--shadow);font-weight:650;cursor:pointer
     }
@@ -209,8 +207,8 @@
         </div>
 
         <div class="tile hero-portrait" aria-label="Porträt">
-          <a href="assets/julia-grieder-portraet.png" target="_blank" rel="noopener" aria-label="Porträt in neuem Tab öffnen">
-            <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager"
+          <a href="assets/images/julia-grieder-portraet.png" target="_blank" rel="noopener" aria-label="Porträt in neuem Tab öffnen">
+            <img src="assets/images/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager"
                  onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
           </a>
         </div>
@@ -226,7 +224,7 @@
           <p><em>Nächster Schritt:</em> Sprechstunde jeweils Donnerstag 18–19 Uhr (Ort folgt).</p>
         </div>
         <div class="tile">
-          <img class="portrait" src="assets/julia-grieder-quad.jpg" alt="" loading="lazy"
+          <img class="portrait" src="assets/images/julia-grieder-quad.jpg" alt="" loading="lazy"
                onerror="this.onerror=null;this.src='assets/image-placeholder-3x4.svg';">
         </div>
       </div>
@@ -276,7 +274,7 @@
       kill.forEach(n => n.remove());
     });
 
-    // Daten
+    // Daten (mit korrektem Bildpfad)
     const DATA = {
       themes: ["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"],
       status: ["Entwurf","In Arbeit","beschlossen"],
@@ -288,7 +286,7 @@
       transparency: [],
       cards: [
         { id:"c1", title:"Velorouten in Brugg sicher machen", theme:"Verkehr", region:"Brugg", date:"2025-09-19",
-          media:"assets/julia-grieder-aktion.jpg", alt:"Julia Grieder bei einer Begehung der Veloroute in Brugg",
+          media:"assets/images/julia-grieder-aktion.jpg", alt:"Julia Grieder bei einer Begehung der Veloroute in Brugg",
           text:"Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
           next:"Begehung mit Tiefbau, Prioritätenliste freigeben." },
         { id:"c2", title:"Schulen entlasten – Zeit für Lernen statt Formulare", theme:"Bildung", region:"Kanton Bern", date:"2025-09-12",
@@ -354,11 +352,10 @@
       const tWrap=$("#themes"); const sWrap=$("#status");
       tWrap.innerHTML=""; sWrap.innerHTML="";
       DATA.themes.forEach(t=>tWrap.appendChild(chip(t,"themes")));
-      ["Entwurf","In Arbeit","beschlossen"].forEach(s=>sWrap.appendChild(chip(s,"status"))); // nur Filter, keine Anzeige
+      DATA.status.forEach(s=>sWrap.appendChild(chip(s,"status")));
     }
 
     // Datum
-    function pad(n){return n.toString().padStart(2,'0')}
     function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
     function formatCHDateLong(dateStr){
       const d=parseLocalDate(dateStr);
@@ -367,7 +364,8 @@
       return s.charAt(0).toUpperCase()+s.slice(1);
     }
 
-    // Agenda
+    // Agenda / ICS
+    function pad(n){return n.toString().padStart(2,'0')}
     function toUTCStr(d){return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`}
     function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
     function escapeICS(s){return (s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n")}
@@ -409,7 +407,7 @@
     function matchesFilters(c){
       const q=state.q.trim().toLowerCase();
       const tOK = state.themes.size===0 ? false : state.themes.has(c.theme);
-      const sOK = state.status.size===0 || true; // Status nur als Filter gedacht
+      const sOK = state.status.size===0 || state.status.has(c.status||"");
       const qOK=!q||[c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
       return tOK && sOK && qOK;
     }
@@ -436,8 +434,7 @@
       let media=null;
       if(c.media){
         const img = el("img",{
-          src:c.media,
-          alt:c.alt||"",
+          src:c.media, alt:c.alt||"",
           onerror:(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src='assets/image-placeholder-16x9.svg'; }
         });
         const a = el("a",{href:c.media,target:"_blank",rel:"noopener","aria-label":"Bild in neuem Tab öffnen"},img);
@@ -453,7 +450,7 @@
       return article;
     }
 
-    // Microtransition
+    // Re-Order Animation
     const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     function getPositions(container){const pos={};container.querySelectorAll('.card').forEach(el=>{const r=el.getBoundingClientRect();pos[el.id]={top:r.top,left:r.left};});return pos;}
     function animateReorder(container,before,after){
