@@ -4,3 +4,7 @@ Sitemap: https://ceccaroni.github.io/webauftritt_jg/sitemap.xml
 
 User-agent: *
 Disallow: /webauftritt_jg/erfassen/
+
+User-agent: *
+Disallow: /webauftritt_jg/erfassen/
+Sitemap: https://ceccaroni.github.io/webauftritt_jg/sitemap.xml
