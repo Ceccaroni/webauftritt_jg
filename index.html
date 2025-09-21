@@ -103,6 +103,7 @@
       .card{border-color:#000;box-shadow:none}
       .label{background:#fff !important;border-color:#000;color:#000}
       a{color:#000;text-decoration:underline}
+      footer{border-top:1px solid #000}
     }
 
     .party-badge{position:absolute;right:0;top:12px;z-index:60;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:.35rem;display:flex;align-items:center}
@@ -226,6 +227,10 @@
         <h3>Kontakt</h3>
         <p class="small">Anliegen kurz schildern. Antwort in der Regel binnen 72h.</p>
       </div>
+      <div class="tcard">
+        <h3>Rechtliches</h3>
+        <p class="small"><a href="./impressum/index.html">Impressum &amp; Datenschutz</a> – jederzeit einsehbar.</p>
+      </div>
     </div>
   </footer>
 
@@ -254,20 +259,35 @@
         else if(v!==null && v!==undefined){ n.setAttribute(k,v); }
       }
       (Array.isArray(children)?children:[children]).forEach(c=>{
-        if(c===null || c===undefined || c===false) return; // Fix: null/undefined/false überspringen
+        if(c===null || c===undefined || c===false) return;
         n.appendChild(typeof c==="string" ? document.createTextNode(c) : c);
       });
       return n;
     }
+
     function parseLocalDate(dateStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);return new Date(Y,(M||1)-1,(D||1));}
+    function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
     function formatCHDateLong(dateStr){
       const d=parseLocalDate(dateStr);
       const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const s=fmt.format(d);
-      return s.charAt(0).toUpperCase()+s.slice(1);
+      const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1);
+    }
+    function formatCHDate(dateStr,timeStr){
+      const d=parseLocalDateTime(dateStr,timeStr);
+      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+      const [hh,mm]=(timeStr||'09:00').split(':');
+      const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1)+`, ${hh}.${mm} Uhr`;
     }
 
-    const STATE = { data:null, q:"", themes:new Set(), status:new Set(), themeOrder:[] };
+    const STATE = {
+      data:null,
+      q:"",
+      themes:new Set(),
+      status:new Set(),
+      themeOrder:[],
+      frontCards:[],
+      archivedCards:[]
+    };
 
     // Chips
     function chip(label, group){
@@ -299,24 +319,17 @@
     // Agenda / ICS
     const pad=n=>n.toString().padStart(2,'0');
     function toUTCStr(d){return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`}
-    function parseLocalDateTime(dateStr,timeStr){const [Y,M,D]=(dateStr||"").split("-").map(Number);const [h,mi]=(timeStr||"09:00").split(":").map(Number);return new Date(Y,(M||1)-1,D||1,h||9,mi||0,0)}
     function escapeICS(s){return (s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\n/g,"\\n")}
     function makeICSBlob(item){
       const startLocal=parseLocalDateTime(item.date,item.time);
       const endLocal=new Date(startLocal.getTime()+60*60*1000);
-      const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//JG Brugg//Agenda//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
+      const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-{JG Brugg}//Agenda//DE","CALSCALE:GREGORIAN","METHOD:PUBLISH","BEGIN:VEVENT",
         `UID:${Date.now()}-${Math.random().toString(36).slice(2)}@jg.brugg`,
         `DTSTAMP:${toUTCStr(new Date())}`,`DTSTART:${toUTCStr(startLocal)}`,`DTEND:${toUTCStr(endLocal)}`,
         `SUMMARY:${escapeICS(item.title||"Termin")}`,`DESCRIPTION:${escapeICS(item.purpose||"")}`,
         `LOCATION:${escapeICS(item.place||"Brugg")}`,`URL:${escapeICS(item.ctaHref||window.location.href)}`,
         "END:VEVENT","END:VCALENDAR"].join("\r\n");
       return new Blob([ics],{type:"text/calendar;charset=utf-8"});
-    }
-    function formatCHDate(dateStr,timeStr){
-      const d=parseLocalDateTime(dateStr,timeStr);
-      const fmt=new Intl.DateTimeFormat('de-CH',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const [hh,mm]=(timeStr||'09:00').split(':');
-      const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1)+`, ${hh}.${mm} Uhr`;
     }
     function renderAgenda(){
       const host=$("#miniAgenda"); if(!host) return; host.innerHTML="";
@@ -337,18 +350,65 @@
 
     // Karten
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
+
+    // TTL/Archivierung
+    function daysBetween(a,b){const MS=24*60*60*1000;return Math.floor((a-b)/MS);}
+    function partitionCards(rawCards){
+      const now = new Date();
+      const byId = new Map(rawCards.map(c => [c.id, c]));
+      const archivedIds = new Set();
+
+      // 1) Supersedes: wenn Karte neuere ersetzt, ältere sofort ins Archiv
+      rawCards.forEach(c=>{
+        const arr = Array.isArray(c.supersedes)? c.supersedes : [];
+        arr.forEach(id => { if(byId.has(id)) archivedIds.add(id); });
+      });
+
+      // 2) Fortsetzung gleicher Sachverhalt: gleiches theme+region → nur neueste bleibt
+      const groups = new Map();
+      rawCards.forEach(c=>{
+        const key = `${norm(c.theme)}|${norm(c.region||"")}`;
+        if(!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(c);
+      });
+      groups.forEach(list=>{
+        list.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+        list.slice(1).forEach(old => archivedIds.add(old.id));
+      });
+
+      // 3) TTL-Regeln
+      rawCards.forEach(c=>{
+        if(archivedIds.has(c.id)) return;
+        const d = parseLocalDate(c.date);
+        if(isNaN(d)) return;
+        const age = daysBetween(now,d);
+        const isBeschlossen = norm(c.status)==="beschlossen";
+        const ttl = isBeschlossen ? 120 : 60;
+        if(age>ttl) archivedIds.add(c.id);
+      });
+
+      // Kandidaten für Front
+      let front = rawCards.filter(c => !archivedIds.has(c.id));
+
+      // 4) Kapazitätsbremse Front: max. 8 (neueste zuerst)
+      front.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
+      const limited = front.slice(0,8);
+      const limitedIds = new Set(limited.map(c=>c.id));
+      front.forEach(c=>{ if(!limitedIds.has(c.id)) archivedIds.add(c.id); });
+
+      // Ergebnis
+      const archived = rawCards.filter(c => archivedIds.has(c.id));
+      return {front: limited, archived};
+    }
+
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
-
-      // Themen: Vereinigung über normalisierte Keys (mind. 1 Thema nötig)
       const hasThemeSelection = STATE.themes.size > 0;
       const tOK = hasThemeSelection ? STATE.themes.has(norm(c.theme)) : false;
 
-      // Status: strikt UND – nur wenn mind. ein Status aktiv ist
       const hasStatusSelection = STATE.status.size > 0;
       const sOK = hasStatusSelection ? (c.status && STATE.status.has(norm(c.status))) : true;
 
-      // Suche
       const qOK = !q || [c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
 
       return tOK && sOK && qOK;
@@ -356,7 +416,7 @@
     function sortCards(a,b){
       const ia = STATE.themeOrder.findIndex(t => norm(t)===norm(a.theme));
       const ib = STATE.themeOrder.findIndex(t => norm(t)===norm(b.theme));
-      if(ia!==ib) return ia-ib;
+      if(ia!==ib && ia!==-1 && ib!==-1) return ia-ib;
       return (b.date||"").localeCompare(a.date||"");
     }
     function card(c){
@@ -404,7 +464,8 @@
     function render(){
       const host=$("#masonry");
       host.setAttribute("aria-busy","true");
-      const list = (STATE.data?.cards||[]).filter(matchesFilters).sort(sortCards);
+      const source = STATE.frontCards || [];
+      const list = source.filter(matchesFilters).sort(sortCards);
       host.innerHTML="";
       if(list.length===0){
         const msg = STATE.themes.size===0 ? "Bitte ein Thema auswählen." : "Kein Ergebnis – Filter anpassen.";
@@ -417,11 +478,11 @@
       host.setAttribute("aria-busy","false");
     }
 
-    // Featured
+    // Featured (nimmt aus allen Karten; wenn archviert, bleibt oben optional sichtbar – Produktentscheid: hier nur Front)
     function renderFeatured(){
       const host = $("#featuredHost");
-      if(!host || !STATE.data) return;
-      const candidates = (STATE.data.cards||[]).filter(c => c.featured===true);
+      if(!host) return;
+      const candidates = (STATE.frontCards||[]).filter(c => c.featured===true);
       if(candidates.length===0){ host.style.display='none'; host.innerHTML=''; return; }
       candidates.sort((a,b)=> (b.date||"").localeCompare(a.date||""));
       const f = candidates[0];
@@ -438,12 +499,12 @@
       host.innerHTML=""; host.appendChild(box); host.style.display='';
     }
 
-    // Live-Box (letzte 30 Tage)
-    function parseLocalDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim()); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
+    // Live-Box (letzte 30 Tage) — bleibt unberührt und zieht aus ALLEN Karten
+    function parseLocalDateFlexible(iso){if(!iso) return null; const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso?.trim?.()||""); if(m){return new Date(+m[1],+m[2]-1,+m[3]);} const d=new Date(iso); return isNaN(d)?null:d;}
     function withinLastDays(iso,days=30){const d=parseLocalDateFlexible(iso); if(!d) return false; const now=new Date(); const ms=days*24*60*60*1000; return (now-d)>=0 && (now-d)<=ms;}
     function renderLive(){
-      const host=$("#liveList"); if(!host) return; host.innerHTML="";
-      const recent=(STATE.data?.cards||[]).filter(c=>withinLastDays(c.date,30)).sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,1);
+      const host=$("#liveList"); if(!host || !STATE.data) return; host.innerHTML="";
+      const recent=(STATE.data.cards||[]).filter(c=>withinLastDays(c.date,30)).sort((a,b)=> (b.date||"").localeCompare(a.date||"")).slice(0,1);
       if(recent.length===0){
         host.appendChild(el("div",{class:"live-item"},[
           el("div",{},"Kein Update in diesem Monat."),
@@ -476,6 +537,14 @@
       const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML="";
       (STATE.data?.transparency||[]).forEach(d=>{const t=d.title||d.href||"Link"; ul.appendChild(el("li",{},el("a",{href:d.href||"#"},t)))});}
 
+    // Partition anwenden und alles zeichnen
+    function applyPartition(){
+      const raw = Array.isArray(STATE.data?.cards) ? STATE.data.cards.slice() : [];
+      const {front, archived} = partitionCards(raw);
+      STATE.frontCards = front;
+      STATE.archivedCards = archived;
+    }
+
     // Daten laden
     async function loadData(){
       try{
@@ -485,7 +554,13 @@
       }catch(e){
         STATE.data = {themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"], status:["Entwurf","In Arbeit","beschlossen"], agenda:[], transparency:[], cards:[]};
       }
-      buildFilters(); renderAgenda(); renderLive(); renderFeatured(); render(); maybeOpenFromHash();
+      buildFilters();
+      applyPartition();
+      renderAgenda();
+      renderLive();
+      renderFeatured();
+      render();
+      maybeOpenFromHash();
     }
     loadData();
 
