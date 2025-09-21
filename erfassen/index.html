@@ -88,8 +88,8 @@
           </div>
           <div>
             <label for="image">Bild-Datei (Pfad) </label>
-            <input id="image" type="text" placeholder="assets/images/dateiname.jpg">
-            <div class="help">Pfad im Repo, z. B. <code>assets/images/...</code></div>
+            <input id="image" type="text" placeholder="assets/images/dateiname.jpg oder nur dateiname.jpg">
+            <div class="help">Pfad im Repo. Dateiname allein genügt; wird automatisch zu <code>assets/images/&lt;datei&gt;</code>.</div>
           </div>
         </div>
 
@@ -132,7 +132,7 @@
         <li>Einen der beiden Downloads wählen:
           <ul>
             <li><strong>Nur Eintrag als JSON</strong> → Datei in <code>assets/cards/</code> ablegen (optional Archiv).</li>
-            <li><strong>content.json aktualisiert</strong> → die heruntergeladene <code>content.json</code> an <code>assets/content.json</code> im Repo ersetzen.</li>
+            <li><strong>content.json aktualisiert</strong> → die heruntergeladene <code>content.json</code> an <code>assets/content.json</code> im Repo ersetzen. <em>Alte Einträge bleiben erhalten.</em></li>
           </ul>
         </li>
         <li>Falls ein Bildpfad gesetzt ist: Bilddatei im Repo unter <code>assets/images/</code> hochladen.</li>
@@ -154,7 +154,6 @@
 
     // --- helpers ---
     const $ = s => document.querySelector(s);
-    const pad = n => n.toString().padStart(2,'0');
     function formatCHDateLong(dateStr){
       if(!dateStr) return "";
       const [Y,M,D] = dateStr.split("-").map(Number);
@@ -168,8 +167,23 @@
         .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/é|è/g,"e")
         .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80);
     }
-    function looksLikeImagePath(p){
-      return /^assets\/images\/.+\.(png|jpe?g|webp|avif|gif)$/i.test(p||"");
+    // akzeptierte Bild-Endungen
+    const IMG_EXT = ['png','jpg','jpeg','webp','avif','gif'];
+    function isFilenameWithExt(p){
+      return /^[^\\/]+\.([a-z0-9]{3,4})$/i.test(p||"");
+    }
+    function hasValidExt(p){
+      const m = /\.([a-z0-9]{3,4})$/i.exec(p||"");
+      return !!(m && IMG_EXT.includes(m[1].toLowerCase()));
+    }
+    function normaliseImagePath(p){
+      if(!p) return "";
+      let v = p.trim();
+      if(!hasValidExt(v)) return ""; // ungültige Endung
+      if(v.startsWith('assets/images/')) return v;
+      if(isFilenameWithExt(v)) return 'assets/images/' + v;
+      // relative andere Ordner werden nicht erlaubt
+      return "";
     }
     function download(filename, text){
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:'application/json;charset=utf-8'}));
@@ -186,7 +200,7 @@
         CONTENT = { themes:["Bildung","Verkehr","Energie","Gleichstellung","Digitalisierung","Lokales"], status:["Entwurf","In Arbeit","beschlossen"], agenda:[], transparency:[], cards:[] };
       }
       const sel=$("#theme"); sel.innerHTML='<option value="">– bitte wählen –</option>';
-      CONTENT.themes.forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
+      (CONTENT.themes||[]).forEach(t=>{ const o=document.createElement('option'); o.textContent=t; sel.appendChild(o); });
     }
     loadContent();
 
@@ -201,7 +215,8 @@
       const theme = $("#theme").value.trim();
       const region = $("#region").value.trim();
       const date = $("#date").value;
-      const media = $("#image").value.trim();
+      const mediaRaw = $("#image").value.trim();
+      const media = normaliseImagePath(mediaRaw);
       const alt   = $("#alt").value.trim();
       const text  = $("#text").value.trim();
       const next  = $("#next").value.trim();
@@ -213,7 +228,7 @@
       if(!date) errors.push("Datum fehlt");
       if(!text) errors.push("Kurztext fehlt");
       if(!next) errors.push("Nächster Schritt fehlt");
-      if(media && !looksLikeImagePath(media)) errors.push("Bildpfad: bitte unter assets/images/... und mit Endung .jpg/.png/.webp");
+      if(mediaRaw && !media) errors.push("Bildpfad ungültig (verwende z. B. assets/images/deinbild.jpg oder nur den Dateinamen)");
 
       const id = "c-" + slugify(title) + "-" + date.replaceAll("-","");
       const obj = { id, title, theme, region, date, text, next };
