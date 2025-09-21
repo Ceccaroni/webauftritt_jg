@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="900" height="1200" viewBox="0 0 900 1200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Bildplatzhalter 3:4">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8f2da"/>
+      <stop offset="1" stop-color="#dfead0"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" rx="28" fill="url(#g)" stroke="#cfdac4"/>
+  <g fill="none" stroke="#c1ccb8" stroke-width="6" stroke-linecap="round">
+    <path d="M120 880l180-240 160 160 200-260 220 340H120z"/>
+    <circle cx="260" cy="360" r="70"/>
+  </g>
+  <text x="50%" y="50%" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial" font-size="42" fill="#637257">Porträt folgt</text>
+</svg>
