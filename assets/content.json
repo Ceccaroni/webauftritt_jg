@@ -1,0 +1,83 @@
+{
+  "themes": ["Bildung", "Verkehr", "Energie", "Gleichstellung", "Digitalisierung", "Lokales"],
+  "status": ["Entwurf", "In Arbeit", "beschlossen"],
+  "agenda": [
+    {
+      "date": "2025-09-26",
+      "time": "18:30",
+      "title": "Veloroute-Spotcheck Ost",
+      "place": "Bahnhof Brugg",
+      "purpose": "Lückenanalyse / Quick Wins",
+      "ctaLabel": "Details",
+      "ctaHref": "https://example.ch/termine/veloroute-spotcheck-ost"
+    }
+  ],
+  "transparency": [],
+  "cards": [
+    {
+      "id": "c1",
+      "title": "Velorouten in Brugg sicher machen",
+      "theme": "Verkehr",
+      "region": "Brugg",
+      "date": "2025-09-19",
+      "media": "assets/images/julia-grieder-aktion.jpg",
+      "alt": "Julia Grieder bei einer Begehung der Veloroute in Brugg",
+      "text": "Lücken zwischen Schule–Bahnhof und Quartier–Zentrum schliessen. Erste Sofortmassnahmen noch vor dem Winter.",
+      "next": "Begehung mit Tiefbau, Prioritätenliste freigeben."
+    },
+    {
+      "id": "c2",
+      "title": "Schulen entlasten – Zeit für Lernen statt Formulare",
+      "theme": "Bildung",
+      "region": "Kanton Bern",
+      "date": "2025-09-12",
+      "text": "Administrationsabbau: Standardisierte Vorlagen, digitale Einreichung, klare Fristen. Monitoring über Q4.",
+      "next": "Umsetzung prüfen: Rückmeldungen von 30 Schulleitungen bündeln."
+    },
+    {
+      "id": "c3",
+      "title": "Sichere, durchgängige Velorouten",
+      "theme": "Verkehr",
+      "region": "Gemeinde",
+      "date": "2025-09-10",
+      "text": "Lücken schliessen: Schule–Bahnhof, Quartier–Zentrum. Quick Wins bis Winter, Kosten < 150’000 CHF.",
+      "next": "Begehung mit Tiefbau, Finanzierungsentscheid im Rat vorbereiten."
+    },
+    {
+      "id": "c4",
+      "title": "Energie fair: Fernwärme mit Sozialtarif",
+      "theme": "Energie",
+      "region": "Gemeinde",
+      "date": "2025-09-18",
+      "text": "Ausbau ja, aber bezahlbar. Fonds aus CO₂-Abgabe zur Abfederung tiefer Einkommen.",
+      "next": "Werkleitungsgespräch; Tarife mit Nachbargemeinden vergleichen."
+    },
+    {
+      "id": "c5",
+      "title": "PV-Pflicht für geeignete Dächer",
+      "theme": "Energie",
+      "region": "Kanton Bern",
+      "date": "2025-08-30",
+      "text": "Genehmigung vereinfacht, Standard bis 30 kW. Leitfaden für Gemeinden folgt.",
+      "next": "Leitfaden-Entwurf in KW 39 (öffentliche Konsultation)."
+    },
+    {
+      "id": "c6",
+      "title": "ÖV verlässlicher machen",
+      "theme": "Verkehr",
+      "region": "Region Emmental",
+      "date": "2025-09-05",
+      "text": "Taktverdichtung zu Schulstart/Feierabend, Busspuren an Engstellen, bessere Anschlüsse an S-Bahn.",
+      "next": "Kosten-Nutzen-Rechnung; Gespräche mit RBS/SBB ansetzen."
+    },
+    {
+      "id": "c7",
+      "title": "Digitale Teilhabe an Schulen",
+      "theme": "Bildung",
+      "region": "Kanton Bern",
+      "date": "2025-09-02",
+      "text": "Bibliotheken als Lernhubs, Open-Source-Endgeräteverwaltung, Datensparsamkeit.",
+      "next": "Pilot mit zwei Oberstufen – Evaluation didaktisch/technisch."
+    }
+  ]
+}
