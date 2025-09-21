@@ -62,13 +62,13 @@
 
     .chips{
       display:flex;
-      flex-wrap:nowrap;          /* kein Umbruch */
+      flex-wrap:nowrap;
       gap:.5rem;
-      overflow:auto;             /* horizontal scrollen bei Platzmangel */
+      overflow:auto;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:thin
     }
-    .chips .chip{flex:0 0 auto}  /* Chips behalten Breite, brechen nicht */
+    .chips .chip{flex:0 0 auto}
 
     .chip{padding:.45rem .75rem;border:1px solid var(--border);border-radius:999px;background:#fff;color:#222;cursor:pointer;font-size:.95rem;transition:transform .16s ease, background .16s ease, color .16s ease}
     .chip[aria-pressed="true"]{background:var(--brand-dark);color:var(--brand-ink);border-color:transparent;transform:translateY(-1px)}
@@ -114,7 +114,6 @@
       .hero .tile{padding:.75rem}
       .hero h2{font-size:1.25rem;line-height:1.25}
       .brandbar{align-items:start}
-      /* Filter bleibt 1 Zeile; nur schmaler */
       .filters{grid-template-columns:1fr auto minmax(180px, 1fr);gap:.6rem;align-items:center}
       .chips{gap:.45rem;padding-bottom:.25rem;scroll-snap-type:x mandatory}
       .chips .chip{flex:0 0 auto;scroll-snap-align:start}
@@ -264,6 +263,7 @@
 
     // Chips
     function chip(label, group){
+      if(!label || (typeof label==="string" && label.trim()==="")) return document.createComment("skip-empty-chip");
       const active = STATE[group]?.has && STATE[group].has(label);
       const c=el("button",{class:"chip","aria-pressed":active?"true":"false"},label);
       c.addEventListener("click",()=>{
@@ -283,8 +283,8 @@
     function buildFilters(){
       const tWrap=$("#themes"); const sWrap=$("#status");
       tWrap.innerHTML=""; sWrap.innerHTML="";
-      (STATE.data?.themes||[]).forEach(t=>tWrap.appendChild(chip(t,"themes")));
-      (STATE.data?.status||[]).forEach(s=>sWrap.appendChild(chip(s,"status")));
+      (STATE.data?.themes||[]).filter(t=>t && String(t).trim()!=="").forEach(t=>tWrap.appendChild(chip(t,"themes")));
+      (STATE.data?.status||[]).filter(s=>s && String(s).trim()!=="").forEach(s=>sWrap.appendChild(chip(s,"status")));
     }
 
     // Agenda / ICS
@@ -330,11 +330,19 @@
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
-      // Themen: ODER-Logik (Vereinigung)
-      const tOK = STATE.themes.size===0 ? false : STATE.themes.has(c.theme);
-      // Status: Nur filtern, wenn Karte einen Status hat; sonst sichtbar lassen
+
+      // Aktive Themen-Menge ohne leere Labels
+      const selectedThemes = Array.from(STATE.themes).filter(t => t && String(t).trim()!=="");
+
+      // Nur Karten der aktiven Themen anzeigen (ODER-Logik über die Auswahl)
+      const tOK = selectedThemes.length>0 ? selectedThemes.includes(c.theme) : false;
+
+      // Status-Filter: nur anwenden, wenn Karte Status hat; Karten ohne Status bleiben sichtbar
       const sOK = (STATE.status.size===0) || (c.status ? STATE.status.has(c.status) : true);
-      const qOK=!q||[c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
+
+      // Freitext
+      const qOK = !q || [c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
+
       return tOK && sOK && qOK;
     }
     function sortCards(a,b){
