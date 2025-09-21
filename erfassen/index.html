@@ -8,7 +8,7 @@
   <style>
     :root{--brand:#84B414;--ink:#1a1a1a;--muted:#5d5d5d;--border:#dde3d6;--paper:#fff;--bg:#f6f8f5;--radius:12px;--shadow:0 1px 2px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.08);--maxw:980px}
     *{box-sizing:border-box}
-    body{margin:0;font:400 17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+    body{margin:0;font:400 17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#f6f8f5}
     header{background:#fff;border-bottom:1px solid var(--border)}
     .wrap{max-width:var(--maxw);margin:0 auto;padding:1rem}
     h1{font-size:1.35rem;margin:.25rem 0}
@@ -79,15 +79,18 @@
         <h2>Karte erfassen</h2>
 
         <label for="title">Titel *</label>
+        <div class="help">Die Überschrift der Karte. Kurz, klar.</div>
         <input id="title" type="text" placeholder="z. B. Velorouten in Brugg sicher machen" required>
 
         <div class="row">
           <div>
             <label for="theme">Bereich *</label>
+            <div class="help">Thema auswählen. Bestimmt den Filter-Chip.</div>
             <select id="theme" required></select>
           </div>
           <div>
             <label for="region">Region/Ort *</label>
+            <div class="help">Wo gilt der Inhalt? Gemeinde, Region oder Kanton.</div>
             <input id="region" type="text" placeholder="z. B. Brugg, Kanton Bern" required>
           </div>
         </div>
@@ -95,42 +98,47 @@
         <div class="row">
           <div>
             <label for="date">Datum (Veröffentlichung) *</label>
+            <div class="help">Steuert die Reihenfolge und Anzeige „Montag, 22. September 2025“.</div>
             <input id="date" type="date" required>
             <div id="dateHuman" class="help"></div>
           </div>
           <div>
             <label for="image">Bild-Datei (optional)</label>
+            <div class="help">Dateiname reicht. Wird zu <code>assets/images/&lt;datei&gt;</code>. Erlaubt: .jpg/.png/.webp.</div>
             <input id="image" type="text" placeholder="assets/images/datei.jpg oder nur datei.jpg">
-            <div class="help">Dateiname allein genügt; wird zu <code>assets/images/&lt;datei&gt;</code>.</div>
           </div>
         </div>
 
         <label for="alt">Bild-Alttext</label>
+        <div class="help">Kurze Beschreibung fürs Bild. Hilft bei Barrierefreiheit.</div>
         <input id="alt" type="text" placeholder="Was ist auf dem Bild zu sehen?">
 
-        <!-- NEU: Dokument-Anhang -->
+        <!-- Dokument-Anhang -->
         <div class="row">
           <div>
-            <label for="doc">Dokument-Datei (PDF/DOCX, optional)</label>
+            <label for="doc">Dokument-Datei (optional)</label>
+            <div class="help">PDF oder DOCX als Anhang. Dateiname reicht – wird zu <code>assets/docs/&lt;datei&gt;</code>.</div>
             <input id="doc" type="text" placeholder="assets/docs/datei.pdf oder nur datei.pdf">
-            <div class="help">Dateiname allein genügt; wird zu <code>assets/docs/&lt;datei&gt;</code>.</div>
           </div>
           <div>
             <label for="docLabel">Dokument-Anzeigename</label>
-            <input id="docLabel" type="text" placeholder="z. B. Beschlussvorlage PDF">
+            <div class="help">Wie der Link heissen soll. Beispiel: „Beschlussvorlage (PDF)“.</div>
+            <input id="docLabel" type="text" placeholder="z. B. Beschlussvorlage (PDF)">
           </div>
         </div>
 
         <label for="text">Kurztext *</label>
-        <textarea id="text" placeholder="2–3 Sätze, klar und konkret." required></textarea>
+        <div class="help">2–3 Sätze: Problem, Lösung, Wirkung.</div>
+        <textarea id="text" placeholder="Kurz beschreiben, worum es geht." required></textarea>
 
         <label for="next">Nächster Schritt *</label>
-        <textarea id="next" placeholder="Was passiert als Nächstes?" required></textarea>
+        <div class="help">Was passiert als Nächstes? Konkret, 1 Satz.</div>
+        <textarea id="next" placeholder="z. B. Begehung mit Tiefbau, Prioritätenliste freigeben." required></textarea>
 
         <div class="row" style="align-items:center">
           <div>
             <label><input id="featured" type="checkbox"> Als Top-Beitrag (featured) anzeigen</label>
-            <div class="help">Wird oben neben dem Porträt gezeigt.</div>
+            <div class="help">Zeigt die Karte zusätzlich oben neben dem Porträt.</div>
           </div>
         </div>
 
@@ -163,33 +171,40 @@
         <h2>Termin erfassen (Agenda)</h2>
 
         <label for="evTitle">Titel *</label>
+        <div class="help">Name des Termins. Kurz und verständlich.</div>
         <input id="evTitle" type="text" placeholder="z. B. Veloroute-Spotcheck Ost" required>
 
         <div class="row">
           <div>
             <label for="evDate">Datum *</label>
+            <div class="help">Datum des Termins.</div>
             <input id="evDate" type="date" required>
             <div id="evDateHuman" class="help"></div>
           </div>
           <div>
             <label for="evTime">Zeit *</label>
+            <div class="help">Startzeit. Beispiel: 18:30.</div>
             <input id="evTime" type="time" value="18:30" required>
           </div>
         </div>
 
         <label for="evPlace">Ort</label>
+        <div class="help">Wo findet der Termin statt? Beispiel: Bahnhof Brugg.</div>
         <input id="evPlace" type="text" placeholder="z. B. Bahnhof Brugg">
 
         <label for="evPurpose">Zweck / Beschreibung</label>
-        <textarea id="evPurpose" placeholder="Kurz beschreiben, was passiert."></textarea>
+        <div class="help">Kurz beschreiben, was passiert.</div>
+        <textarea id="evPurpose" placeholder="Kurzbeschreibung"></textarea>
 
         <div class="row">
           <div>
-            <label for="evCtaLabel">CTA-Label</label>
+            <label for="evCtaLabel">Externer Link – Titel</label>
+            <div class="help">Text des Links. Beispiel: „Details“ oder „Anmeldung“.</div>
             <input id="evCtaLabel" type="text" placeholder="z. B. Details">
           </div>
           <div>
-            <label for="evCtaHref">CTA-Link</label>
+            <label for="evCtaHref">Externer Link – Adresse</label>
+            <div class="help">Komplette Internetadresse. Beginnt mit <code>https://</code>.</div>
             <input id="evCtaHref" type="text" placeholder="https://…">
           </div>
         </div>
@@ -209,25 +224,24 @@
             <p class="help">Noch kein Termin erzeugt.</p>
           </div>
 
-          <div class="json-head">
-            <h2 style="margin:0">JSON-Termin</h2>
-          </div>
-          <pre id="evOut">{}</pre>
+        <div class="json-head">
+          <h2 style="margin:0">JSON-Termin</h2>
         </div>
+        <pre id="evOut">{}</pre>
       </section>
     </div>
 
     <section class="card" style="margin-top:1rem">
       <h2>Basisdaten</h2>
+      <div class="help">Wenn das Live-Laden blockiert ist, kannst du hier eine lokale <code>content.json</code> wählen. Sie dient dann als Grundlage.</div>
       <div class="actions">
         <input id="file" type="file" accept="application/json">
-        <span class="help">Alternativ lokale <code>content.json</code> wählen (wird als Basis verwendet).</span>
       </div>
     </section>
   </main>
 
   <script>
-    // leichter Zutritt
+    // Zutritt
     const PASSPHRASE = "brugg";
     const gate = document.getElementById('gate');
     const gateMsg = document.getElementById('gateMsg');
@@ -253,7 +267,7 @@
       .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue").replace(/é|è/g,"e")
       .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,80); }
 
-    // Pfad-Helfer
+    // Pfade
     const IMG_EXT=['png','jpg','jpeg','webp','avif','gif'];
     const DOC_EXT=['pdf','docx'];
     function hasExt(p, list){ const m=/\.([a-z0-9]{3,4})$/i.exec(p||""); return !!(m && list.includes(m[1].toLowerCase())); }
@@ -286,7 +300,7 @@
       const s=fmt.format(d); return s.charAt(0).toUpperCase()+s.slice(1);
     }
 
-    // content.json laden / neu laden / lokal einlesen
+    // content.json laden
     let CONTENT=null;
     async function fetchLiveContent(){
       const res=await fetch('../assets/content.json',{cache:'no-store'});
@@ -304,7 +318,7 @@
         hydrateThemeSelect();
       }
     }
-    $("#reload").addEventListener('click', loadLive);
+    document.getElementById('reload').addEventListener('click', loadLive);
 
     function hydrateThemeSelect(){
       const sel=$("#theme"); if(!sel) return;
@@ -329,7 +343,7 @@
       const v=e.target.value; $("#evDateHuman").textContent = v ? "→ "+formatCHDateLong(v) : "";
     });
 
-    // Objekt bauen (Karte)
+    // Karte bauen
     function buildCardObject(){
       const title=$("#title").value.trim();
       const theme=$("#theme").value.trim();
@@ -360,13 +374,10 @@
       if(media) obj.media=media;
       if(alt) obj.alt=alt;
       if(featured) obj.featured=true;
-      if(doc){
-        obj.attachments=[{ href: doc, label: docLabel || doc.split('/').pop() }];
-      }
+      if(doc){ obj.attachments=[{ href: doc, label: docLabel || doc.split('/').pop() }]; }
       return {ok:errors.length===0, errors, obj};
     }
 
-    // Vorschau (Karte)
     function renderCardPreview(c){
       const prev=$("#preview"); prev.innerHTML="";
       const labels=document.createElement("div"); labels.className="labels";
@@ -379,7 +390,6 @@
       else { prev.append(h3,labels,p1,p2); }
     }
 
-    // Merge (nur Karten)
     function mergedContentCard(newObj){
       const base = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
       base.cards = base.cards || [];
@@ -388,7 +398,7 @@
       return base;
     }
 
-    // Aktionen (Karte)
+    // Aktionen – Karte
     $("#btnPreview").addEventListener("click", ()=>{
       const res=buildCardObject();
       const msg=$("#msg");
@@ -433,7 +443,7 @@
       ["btnDownloadCard","btnDownloadContent","btnCopy","btnCopyMerged"].forEach(id=>$("#"+id).disabled=true);
     });
 
-    // Termin-Objekt
+    // Termin bauen
     function buildEventObject(){
       const title=$("#evTitle").value.trim();
       const date=$("#evDate").value;
@@ -457,29 +467,26 @@
       return {ok:errors.length===0, errors, obj};
     }
 
-    // Termin-Vorschau
     function renderEventPreview(eo){
       const prev=$("#evPreview"); prev.innerHTML="";
       const h3=document.createElement("h3"); h3.textContent=eo.title;
       const meta=document.createElement("p"); meta.textContent = formatCHDateLong(eo.date)+", "+(eo.time||"");
       const p1=document.createElement("p"); p1.textContent = eo.place ? eo.place : "—";
       const p2=document.createElement("p"); p2.textContent = eo.purpose ? eo.purpose : "—";
-      prev.append(h3,meta,p1,p2);
+      if(eo.ctaLabel && eo.ctaHref){ const p3=document.createElement("p"); p3.textContent = `Externer Link: ${eo.ctaLabel} (${eo.ctaHref})`; prev.append(h3,meta,p1,p2,p3); }
+      else { prev.append(h3,meta,p1,p2); }
     }
 
-    // Merge (nur Agenda)
     function mergedContentAgenda(newEvent){
       const base = CONTENT ? JSON.parse(JSON.stringify(CONTENT)) : {themes:[],status:[],agenda:[],transparency:[],cards:[]};
       base.agenda = base.agenda || [];
-      // Dubletten vermeiden: Titel + Datum + Zeit
       base.agenda = base.agenda.filter(a => !(a.title===newEvent.title && a.date===newEvent.date && (a.time||"")===(newEvent.time||"")));
-      // Nach Datum absteigend einsortieren: zuerst hinzufügen, danach sortieren
       base.agenda.unshift(newEvent);
       base.agenda.sort((a,b)=> (b.date||"").localeCompare(a.date||"") || (b.time||"").localeCompare(a.time||""));
       return base;
     }
 
-    // Aktionen (Termin)
+    // Aktionen – Termin
     $("#btnPreviewEvent").addEventListener("click", ()=>{
       const res=buildEventObject();
       const msg=$("#evMsg");
