@@ -154,24 +154,24 @@
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
 
-        <!-- Featured -->
-        <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
+          <!-- Featured -->
+          <div id="featuredHost" class="tile" style="display:none" aria-label="Top-Beitrag"></div>
 
-        <!-- LIVE-BOX -->
-        <div class="tile" aria-label="Aktuelles Update">
-          <h3>Diese Woche erledigt</h3>
-          <div id="liveList" class="live-list" aria-live="polite"></div>
-          <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
-            <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
-            <button class="btn secondary" type="submit">Senden</button>
-          </form>
-        </div>
+          <!-- LIVE-BOX -->
+          <div class="tile" aria-label="Aktuelles Update">
+            <h3>Diese Woche erledigt</h3>
+            <div id="liveList" class="live-list" aria-live="polite"></div>
+            <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
+              <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
+              <button class="btn secondary" type="submit">Senden</button>
+            </form>
+          </div>
 
-        <!-- Nächste Termine -->
-        <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
-          <h3>Nächste Termine in Brugg</h3>
-          <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
-        </div>
+          <!-- Nächste Termine -->
+          <div class="tile mini-agenda" aria-label="Nächste Termine in Brugg">
+            <h3>Nächste Termine in Brugg</h3>
+            <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
+          </div>
         </div>
 
         <div class="tile hero-portrait" aria-label="Porträt">
@@ -330,9 +330,10 @@
     function label(text,cls=""){return el("span",{class:"label "+cls},text)}
     function matchesFilters(c){
       const q=STATE.q.trim().toLowerCase();
-      // Mehrfachauswahl: Vereinigung aller gewählten Themen
+      // Themen: ODER-Logik (Vereinigung)
       const tOK = STATE.themes.size===0 ? false : STATE.themes.has(c.theme);
-      const sOK = STATE.status.size===0 || STATE.status.has(c.status||"");
+      // Status: Nur filtern, wenn Karte einen Status hat; sonst sichtbar lassen
+      const sOK = (STATE.status.size===0) || (c.status ? STATE.status.has(c.status) : true);
       const qOK=!q||[c.title,c.text,c.theme,c.region].join(" ").toLowerCase().includes(q);
       return tOK && sOK && qOK;
     }
