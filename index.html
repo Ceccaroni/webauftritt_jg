@@ -35,6 +35,7 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .hero h2{margin:.25rem 0 .25rem 0;font-size:1.45rem}
 .hero p{margin:.25rem 0 0 0;color:#2c2c2c;max-width:70ch}
 .hero .tile{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.9rem}
+.hero-copy{display:grid;gap:.75rem}
 
 /* Über mich */
 .about{display:none;margin:.25rem 0 0 0}
@@ -46,7 +47,7 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .about .portrait{aspect-ratio:3/4;border-radius:12px;object-fit:cover}
 
 /* Mini-Agenda */
-.mini-agenda{margin-top:.75rem}
+.mini-agenda{margin-top:.25rem}
 .mini-agenda h3{font-size:1.0rem;margin:.1rem 0 .4rem 0}
 .agenda-list{display:grid;gap:.4rem}
 .agenda-item{display:grid;grid-template-columns:var(--agenda-date-w) 1fr;gap:.6rem;background:#fff;border:1px solid var(--border);border-radius:10px;padding:.55rem .65rem}
@@ -55,6 +56,14 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .agenda-meta .where{color:#2b2b2b}
 .agenda-cta{margin-top:.35rem;display:flex;gap:.8rem;flex-wrap:wrap}
 .agenda-cta a{font-weight:650}
+
+/* LIVE-BOX */
+.live-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.9rem}
+.live-box h3{margin:.1rem 0 .4rem 0;font-size:1.05rem}
+.live-list{display:grid;gap:.5rem}
+.live-item{display:grid;gap:.35rem}
+.live-item .stamp{color:#374; font-size:.9rem}
+.live-item .proof{color:#1f3d1f}
 
 /* Filter */
 .filters{display:grid;grid-template-columns:1fr auto auto;gap:.75rem;align-items:end;margin-top:.75rem}
@@ -79,7 +88,7 @@ header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid 
 .label.status-beschlossen{background:#eef4ff;border-color:#ccdbff}
 .label.them{background:#f1f7ea}
 .label.region{background:#f4f6f8}
-.label.date{background:#fff;color:#2c2c2c}
+.label.date{background:#fff;color:var(--muted)}
 .body p{margin:.25rem 0 .55rem 0}
 .body .next{margin-top:.55rem;font-size:.95rem;color:#1f3d1f}
 .actions{display:flex;gap:.5rem;padding:.75rem .95rem;border-top:1px solid var(--border);background:#fafbfc}
@@ -118,13 +127,11 @@ footer{border-top:1px solid var(--border);background:#fff}
 @media(max-width:720px){.brandbar.badge-collide{padding-right:0}}
 .filters{display:grid;grid-template-columns:auto auto 1fr;gap:.75rem;align-items:end;margin-top:.75rem}
 
-/* Phone: nur Reihenfolge im Hero drehen (Portrait vor Text), Webansicht bleibt gleich */
 @media(max-width:720px){
   .hero-grid{grid-template-columns:1fr;gap:.75rem;padding:.8rem 0}
   .hero .tile{padding:.75rem}
   .hero h2{font-size:1.25rem;line-height:1.25}
   .hero p{font-size:1rem}
-  .hero-portrait{order:-1} /* Portrait zuerst */
   .cta .btn{padding:.5rem .8rem;font-weight:600}
   .brandbar{align-items:start}
   .filters{grid-template-columns:1fr;gap:.6rem;align-items:stretch}
@@ -136,6 +143,10 @@ footer{border-top:1px solid var(--border);background:#fff}
   body{padding-bottom:max(env(safe-area-inset-bottom),0px)}
   .agenda-item{grid-template-columns:1fr}
   .about-grid{grid-template-columns:1fr}
+
+  /* Mobile-Reihenfolge: Foto zuerst, dann Live-Box */
+  .hero-portrait{order:-1}
+  .live-box{order:1}
 }
 
 .agenda-cta a{color:#3f6b00;text-decoration:underline;line-height:2.2}
@@ -177,18 +188,30 @@ footer{border-top:1px solid var(--border);background:#fff}
         <div class="hero-copy">
           <h2>„Politik, die wirkt. Heute Entscheidungen treffen, die morgen tragen.“</h2>
           <p>Schwerpunkt: <strong>Bildung</strong>, <strong>Verkehr</strong>, <strong>Energie</strong>. Transparent, nachvollziehbar, messbar.</p>
-          <div class="mini-agenda" aria-label="Nächste Termine in Brugg">
-            <h3>Nächste Termine in Brugg</h3>
-            <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
-          </div>
-        </div>
-        <div class="tile hero-portrait" aria-label="Porträt">
-          <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
-        </div>
-      </div>
-    </section>
 
 ```
+      <!-- LIVE-BOX: Diese Woche erledigt -->
+      <div class="live-box tile" aria-label="Aktuelles Update">
+        <h3>Diese Woche erledigt</h3>
+        <div id="liveList" class="live-list" aria-live="polite"></div>
+        <form id="gapForm" class="search" style="margin-top:.6rem" aria-label="Sag mir die nächste Lücke">
+          <input id="gapInput" type="text" placeholder="Sag mir die nächste Lücke … (Ort, Problem)" aria-label="Nächste Lücke melden">
+          <button class="btn secondary" type="submit">Senden</button>
+        </form>
+      </div>
+
+      <div class="mini-agenda" aria-label="Nächste Termine in Brugg">
+        <h3>Nächste Termine in Brugg</h3>
+        <div id="miniAgenda" class="agenda-list" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <div class="tile hero-portrait" aria-label="Porträt">
+      <img src="assets/julia-grieder-portraet.png" alt="Julia Grieder, Brugg – Porträt am Aareufer." loading="eager">
+    </div>
+  </div>
+</section>
+
 <!-- Über mich (nur auf Klick sichtbar) -->
 <section id="ueber-mich" class="about" aria-label="Über mich">
   <div class="about-grid wrap">
@@ -243,7 +266,7 @@ footer{border-top:1px solid var(--border);background:#fff}
       {"@type":"Event","name":"Sprechstunde auf dem Neumarktplatz","startDate":"2025-10-10T12:15:00+02:00","eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode","eventStatus":"https://schema.org/EventScheduled","location":{"@type":"Place","name":"Neumarktplatz Brugg","address":{"@type":"PostalAddress","addressLocality":"Brugg","addressCountry":"CH"}},"description":"Kurze Gespräche zu Bildung, Verkehr, Energie.","organizer":{"@type":"Person","name":"Julia Grieder"},"url":"https://example.ch/termine/sprechstunde-neumarkt"}]}</script>
 
   <script>
-    /* Entferne versehentlich eingefügte Markdown-Backticks ``` aus dem DOM */
+    /* Entferne versehentlich eingefügte Markdown-Backticks aus dem DOM */
     document.addEventListener('DOMContentLoaded', () => {
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       const kill=[]; while(w.nextNode()){ const n=w.currentNode; if(n.nodeValue && n.nodeValue.trim()==='```') kill.push(n); }
@@ -445,6 +468,46 @@ footer{border-top:1px solid var(--border);background:#fff}
       host.setAttribute("aria-busy","false");
     }
 
+    // --- LIVE-BOX Logik ---
+    function parseDateFlexible(iso){
+      if(!iso) return null;
+      // YYYY-MM-DD
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+      if(m){ return new Date(Number(m[1]), Number(m[2])-1, Number(m[3])); }
+      // fallback
+      const d = new Date(iso);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    function withinLastDays(iso, days=30){
+      const d = parseDateFlexible(iso);
+      if(!d) return false;
+      const now = new Date();
+      const ms = days*24*60*60*1000;
+      return (now - d) >= 0 && (now - d) <= ms;
+    }
+    function renderLive(){
+      const host=$("#liveList"); if(!host) return; host.innerHTML="";
+      const recent=(DATA.cards||[])
+        .filter(c=>withinLastDays(c.date,30))
+        .sort((a,b)=> (b.date||"").localeCompare(a.date||""))
+        .slice(0,1);
+
+      if(recent.length===0){
+        host.appendChild(el("div",{class:"live-item"},[
+          el("div",{},"Kein Update in diesem Monat."),
+          el("div",{class:"stamp"},"Stand: "+ new Intl.DateTimeFormat('de-CH',{dateStyle:'medium'}).format(new Date()))
+        ]));
+        return;
+      }
+      const c=recent[0];
+      host.appendChild(el("div",{class:"live-item"},[
+        el("strong",{}, c.title),
+        el("div",{class:"stamp"}, `Status: ${c.status} · ${c.region||''} · ${c.date}`),
+        el("div",{}, c.text),
+        el("div",{class:"proof"},"Nächster Schritt: " + (c.next||"–"))
+      ]));
+    }
+
     // About-Toggle
     const aboutBtn = $("#aboutBtn");
     const aboutSection = $("#ueber-mich");
@@ -469,9 +532,30 @@ footer{border-top:1px solid var(--border);background:#fff}
     $("#mitmachenBtn").addEventListener("click", () => alert("Mitmachen: kurzes Formular (Demo)."));
     $("#newsletterBtn").addEventListener("click", () => alert("Newsletter: DSG-konformer Versand (Demo)."));
 
+    // Tick: zentraler Render-Flow
+    function renderTransparency(){
+      const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML="";
+      const links=DATA.transparency||[]; if(links.length===0) return;
+      links.forEach(d=>{const t=d.title||d.href||"Link"; ul.appendChild(el("li",{},el("a",{href:d.href||"#"},t)))});}
+
+    function tick(){
+      renderLive();
+      renderAgenda();
+      renderTransparency();
+      buildFilters();
+      render();
+      maybeOpenFromHash();
+    }
+
     // Init
-    function renderTransparency(){ const ul=$("#transparencyList"); if(!ul) return; ul.innerHTML=""; (DATA.transparency||[]).forEach(d=>ul.appendChild(el("li",{},el("a",{href:d.href||"#"},d.title||d.href||"Link")))); }
-    buildFilters(); renderAgenda(); renderTransparency(); render(); maybeOpenFromHash();
+    tick();
+
+    // Live-Box: Dummy-Handler (no-op, nur Demo)
+    document.getElementById('gapForm')?.addEventListener('submit', e=>{
+      e.preventDefault();
+      const v = document.getElementById('gapInput')?.value?.trim();
+      if(v){ alert("Danke! Gemeldete Lücke: "+v); (document.getElementById('gapInput').value=""); }
+    });
   </script>
 
 </body>
